@@ -1,0 +1,31 @@
+{
+  "name": "@monorepo-services/api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
+    "start:dev": "NODE_ENV=local nodemon -r tsconfig-paths/register ./src/index.ts",
+    "start:prod": "NODE_ENV=production node ./dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.6.5",
+  "dependencies": {
+    "@monorepo-packages/shared": "workspace:*",
+    "@monorepo-packages/logger": "workspace:*",
+    "express": "^4.21.2",
+    "znv": "^0.4.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.11",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.2"
+  }
+}
