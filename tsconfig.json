@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "lib": [
+      "DOM", "ESNext.Object", "ES2022"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@monorepo-packages/shared/*": ["packages/shared/src/*"],
+      "@monorepo-packages/logger": ["packages/logger/src/index.ts"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "dist/**/*",
+    "packages/**/*"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "node_modules"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@monorepo-packages/shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "./constants": "./dist/constants/index.js",
+    "./utils": "./dist/utils/index.js",
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "rm -rf ./dist && tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.6.5",
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
