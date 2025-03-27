@@ -1,5 +1,5 @@
 {
-  "name": "@monorepo-services/api",
+  "name": "@monorepo-services/restful-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

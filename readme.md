@@ -1,6 +1,6 @@
 # 🧱 Monorepo Template — Powered by pnpm workspace, TypeScript, and Node.js
 
-Welcome to the **ultimate backend monorepo template** — designed for **high-performance services**, clean architecture, and **maximum developer experience**.
+Welcome to the **ultimate monorepo template** — designed for **high-performance services**, clean architecture, and **maximum developer experience**.
 
 > ✨ Perfect for microservices, modular APIs, or scaling teams with shared utilities.
 

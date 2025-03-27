@@ -2,6 +2,7 @@ import express from "express";
 import config  from "./config";
 import { Server } from "node:http";
 import { logger } from "@monorepo-packages/logger";
+import routerV1 from "./routes/v1";
 
 
 const { PORT } = config;
@@ -16,6 +17,8 @@ function bootstrap() {
   app.get('/', (req, res) => {
     res.send('Hello from Express API in pnpm workspace!');
   });
+
+  app.use("/api/v1", routerV1);
 
   const server = app.listen(PORT, () => {
     logger.info(`API server running at http://localhost:${PORT}`);
