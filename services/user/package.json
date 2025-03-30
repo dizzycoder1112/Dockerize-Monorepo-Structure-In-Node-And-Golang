@@ -1,0 +1,35 @@
+{
+  "name": "@monorepo-services/user",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types":"dist/index.d.ts",
+  "exports":{
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
+    "start:local": "NODE_ENV=local nodemon -r tsconfig-paths/register ./src/index.ts",
+    "db:migrate:create": "pnpx prisma migrate dev --create-only",
+    "db:migrate:deploy": "pnpx prisma migrate deploy",
+    "db:generate": "pnpx prisma generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.6.5",
+  "devDependencies": {
+    "prisma": "6.5.0",
+    "@types/node": "^22.13.11",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@monorepo-packages/logger": "workspace:*",
+    "@monorepo-packages/db": "workspace:*",
+    "@prisma/client": "6.5.0"
+  }
+}

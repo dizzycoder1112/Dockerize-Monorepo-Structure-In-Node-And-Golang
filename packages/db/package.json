@@ -1,15 +1,14 @@
 {
-  "name": "@monorepo-packages/shared",
+  "name": "@monorepo-packages/db",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    "./constants": "./dist/constants/index.js",
-    "./utils": "./dist/utils/index.js",
     ".": "./dist/index.js"
   },
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf ./dist && tsc -p tsconfig.prod.json"
   },
   "keywords": [],
@@ -17,6 +16,12 @@
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "devDependencies": {
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "@types/node": "^22.13.11"
+  },
+  "dependencies": {
+    "@monorepo-packages/shared": "workspace:*",
+    "@prisma/client": "^6.5.0"
+    
   }
 }

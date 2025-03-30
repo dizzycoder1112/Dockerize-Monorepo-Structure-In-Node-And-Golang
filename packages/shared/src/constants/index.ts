@@ -1,1 +1,1 @@
-export const haha = 'haha2';
+export * from './prisma'

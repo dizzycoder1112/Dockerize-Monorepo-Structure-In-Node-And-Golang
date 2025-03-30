@@ -14,9 +14,12 @@
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "dependencies": {
-    "@monorepo-packages/shared": "workspace:*",
     "@monorepo-packages/logger": "workspace:*",
+    "@monorepo-packages/shared": "workspace:*",
+    "@monorepo-packages/db": "workspace:*",
+    "@monorepo-services/user": "workspace:*",
     "express": "^4.21.2",
+    "uuid": "^11.1.0",
     "znv": "^0.4.0",
     "zod": "^3.24.2"
   },

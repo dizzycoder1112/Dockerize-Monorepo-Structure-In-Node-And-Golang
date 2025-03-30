@@ -12,13 +12,14 @@
     "baseUrl": ".",
     "paths": {
       "@monorepo-packages/shared/*": ["packages/shared/src/*"],
-      "@monorepo-packages/logger": ["packages/logger/src/index.ts"]
+      "@monorepo-packages/db": ["packages/db/src/index.ts"],
+      "@monorepo-packages/logger": ["packages/logger/src/index.ts"],
+      "@monorepo-services/user": ["services/user/src/index.ts"]
     }
   },
   "include": [
-    "src/**/*.ts",
-    "dist/**/*",
-    "packages/**/*"
+    "packages/**/*",
+    "services/**/*"
   ],
   "exclude": [
     "**/*.spec.ts",
