@@ -3,12 +3,16 @@ import config  from "./config";
 import { Server } from "node:http";
 import { logger } from "@monorepo-packages/logger";
 import routerV1 from "./routes/v1";
+import { traceMiddleware } from "./middleware";
 
 
 const { PORT } = config;
 
 function bootstrap() {
   const app = express();
+
+  app.use(traceMiddleware)
+  app.use("/api/v1", routerV1);
 
   app.get("/health-check", async (_req, res) => {
     res.status(200).send("OK");
@@ -18,7 +22,6 @@ function bootstrap() {
     res.send('Hello from Express API in pnpm workspace!');
   });
 
-  app.use("/api/v1", routerV1);
 
   const server = app.listen(PORT, () => {
     logger.info(`API server running at http://localhost:${PORT}`);
