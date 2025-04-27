@@ -1,4 +1,3 @@
-export * from './prismaEventEmiiter';
-export * from './prismaEventRegister';
-export * from './traceAsyncContext';
+export * from './kyselyLog'
+export * from './traceAsyncContext'
 

@@ -1,0 +1,5 @@
+export enum SERVICE_NAME {
+  API = 'API-SERVICE',
+  CRON = 'CRON-SERVICE',
+  USER = 'USER-SERVICE',
+}

@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
-  "types":"dist/index.d.ts",
-  "exports":{
+  "types": "dist/index.d.ts",
+  "exports": {
     ".": "./dist/index.js"
   },
   "scripts": {
@@ -20,16 +20,21 @@
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "devDependencies": {
-    "prisma": "6.5.0",
     "@types/node": "^22.13.11",
+    "@types/pg": "^8.11.11",
     "nodemon": "^3.1.9",
+    "prisma": "6.5.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@monorepo-packages/logger": "workspace:*",
     "@monorepo-packages/db": "workspace:*",
-    "@prisma/client": "6.5.0"
+    "@monorepo-packages/logger": "workspace:*",
+    "@prisma/client": "6.5.0",
+    "kysely": "^0.27.6",
+    "pg": "^8.14.1",
+    "znv": "^0.4.0",
+    "zod": "^3.24.2"
   }
 }
