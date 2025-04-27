@@ -16,12 +16,12 @@
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "devDependencies": {
-    "typescript": "^5.8.2",
-    "@types/node": "^22.13.11"
+    "@types/node": "^22.13.11",
+    "typescript": "^5.8.2"
   },
   "dependencies": {
     "@monorepo-packages/shared": "workspace:*",
-    "@prisma/client": "^6.5.0"
-    
+    "@prisma/client": "^6.5.0",
+    "kysely": "^0.27.6"
   }
 }
