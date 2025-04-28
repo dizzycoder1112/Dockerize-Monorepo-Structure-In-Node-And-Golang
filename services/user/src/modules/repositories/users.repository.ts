@@ -1,5 +1,5 @@
 import { Kysely } from 'kysely'
-import { Database } from '../db/schema'
+import { Database } from '../../db/schema'
 
 export class UserRepository {
   constructor(private db: Kysely<Database>) {}
