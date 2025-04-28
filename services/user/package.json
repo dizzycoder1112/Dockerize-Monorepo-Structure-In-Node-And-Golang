@@ -31,6 +31,7 @@
   "dependencies": {
     "@monorepo-packages/db": "workspace:*",
     "@monorepo-packages/logger": "workspace:*",
+    "@monorepo-packages/shared": "workspace:*",
     "@prisma/client": "6.5.0",
     "kysely": "^0.27.6",
     "pg": "^8.14.1",

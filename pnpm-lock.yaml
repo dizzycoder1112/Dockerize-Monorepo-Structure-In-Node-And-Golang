@@ -10,6 +10,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@monorepo-packages/logger':
+        specifier: workspace:*
+        version: link:../logger
       '@monorepo-packages/shared':
         specifier: workspace:*
         version: link:../shared
@@ -103,6 +106,9 @@ importers:
       '@monorepo-packages/logger':
         specifier: workspace:*
         version: link:../../packages/logger
+      '@monorepo-packages/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@prisma/client':
         specifier: 6.5.0
         version: 6.5.0(prisma@6.5.0(typescript@5.8.2))(typescript@5.8.2)

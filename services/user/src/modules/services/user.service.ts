@@ -1,17 +1,21 @@
-import { UserRepository } from './user.repository'
+import { RepositoryFactory } from "../repositories"
+
 
 export class UserService {
-  constructor(private repo: UserRepository) {}
+  constructor(private repoFactory: RepositoryFactory) {}
 
   async getUser(id: number) {
-    return this.repo.findById(id)
+    const userRepo = this.repoFactory.usersRepository()
+    return userRepo.findById(id)
   }
 
   async getUsers() {
-    return this.repo.findAll()
+    const userRepo = this.repoFactory.usersRepository()
+    return userRepo.findAll()
   }
 
   async createUser(nickname: string) {
-    return this.repo.create(nickname)
+    const userRepo = this.repoFactory.usersRepository()
+    return userRepo.create(nickname)
   }
 }
