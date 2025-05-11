@@ -1,5 +1,5 @@
 {
-  "name": "@monorepo-packages/db",
+  "name": "@ts-packages/db",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -20,9 +20,8 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@monorepo-packages/shared": "workspace:*",
-    "@monorepo-packages/logger": "workspace:*",
-    "@prisma/client": "^6.5.0",
+    "@ts-packages/shared": "workspace:*",
+    "@ts-packages/logger": "workspace:*",
     "kysely": "^0.27.6"
   }
 }

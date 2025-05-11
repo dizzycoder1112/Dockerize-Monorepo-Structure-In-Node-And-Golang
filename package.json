@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "workspaces": [
-    "services/*",
-    "packages/*"
+    "apps/*",
+    "ts-packages/*"
   ],
   "scripts": {
     "build": "pnpm -r run build"
