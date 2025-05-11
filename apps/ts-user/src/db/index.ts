@@ -1,9 +1,9 @@
-import {  createKyselyLogger } from "@monorepo-packages/db";
+import {  createKyselyLogger } from "@ts-packages/db";
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
 import { Pool } from 'pg'
 import { Database } from './schema'
 import { config } from "../config";
-import { SERVICE_NAME } from "@monorepo-packages/shared/constants";
+import { SERVICE_NAME } from "@ts-packages/shared/constants";
 
 
 const { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER } = config

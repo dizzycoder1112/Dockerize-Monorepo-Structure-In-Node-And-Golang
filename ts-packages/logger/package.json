@@ -1,5 +1,5 @@
 {
-  "name": "@monorepo-packages/logger",
+  "name": "@ts-packages/logger",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -16,7 +16,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "dependencies": {
-    "@monorepo-packages/shared": "workspace:*",
+    "@ts-packages/shared": "workspace:*",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0"
   },

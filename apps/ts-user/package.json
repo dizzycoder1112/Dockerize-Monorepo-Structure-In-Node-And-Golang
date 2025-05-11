@@ -1,5 +1,5 @@
 {
-  "name": "@monorepo-services/user",
+  "name": "@apps/ts-user",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -10,7 +10,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
-    "start:local": "NODE_ENV=local nodemon -r tsconfig-paths/register ./src/index.ts",
     "db:migrate:create": "pnpx prisma migrate dev --create-only",
     "db:migrate:deploy": "pnpx prisma migrate deploy",
     "db:generate": "pnpx prisma generate"
@@ -29,9 +28,9 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@monorepo-packages/db": "workspace:*",
-    "@monorepo-packages/logger": "workspace:*",
-    "@monorepo-packages/shared": "workspace:*",
+    "@ts-packages/db": "workspace:*",
+    "@ts-packages/logger": "workspace:*",
+    "@ts-packages/shared": "workspace:*",
     "@prisma/client": "6.5.0",
     "kysely": "^0.27.6",
     "pg": "^8.14.1",

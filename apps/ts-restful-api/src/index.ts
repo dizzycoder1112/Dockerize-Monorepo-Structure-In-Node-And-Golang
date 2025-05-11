@@ -1,7 +1,7 @@
 import express from "express";
 import config  from "./config";
 import { Server } from "node:http";
-import { logger } from "@monorepo-packages/logger";
+import { logger } from "@ts-packages/logger";
 import routerV1 from "./routes/v1";
 import { traceMiddleware } from "./middleware";
 

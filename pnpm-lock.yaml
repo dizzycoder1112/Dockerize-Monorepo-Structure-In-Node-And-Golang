@@ -8,64 +8,29 @@ importers:
 
   .: {}
 
-  packages/db:
+  apps/ts-restful-api:
     dependencies:
-      '@monorepo-packages/logger':
+      '@apps/ts-user':
         specifier: workspace:*
-        version: link:../logger
-      '@monorepo-packages/shared':
+        version: link:../ts-user
+      '@bufbuild/protobuf':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@connectrpc/connect':
+        specifier: ^2.0.2
+        version: 2.0.2(@bufbuild/protobuf@2.3.0)
+      '@connectrpc/connect-node':
+        specifier: ^2.0.2
+        version: 2.0.2(@bufbuild/protobuf@2.3.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.3.0))
+      '@ts-packages/db':
         specifier: workspace:*
-        version: link:../shared
-      '@prisma/client':
-        specifier: ^6.5.0
-        version: 6.5.0(prisma@6.5.0(typescript@5.8.2))(typescript@5.8.2)
-      kysely:
-        specifier: ^0.27.6
-        version: 0.27.6
-    devDependencies:
-      '@types/node':
-        specifier: ^22.13.11
-        version: 22.13.11
-      typescript:
-        specifier: ^5.8.2
-        version: 5.8.2
-
-  packages/logger:
-    dependencies:
-      '@monorepo-packages/shared':
+        version: link:../../ts-packages/db
+      '@ts-packages/logger':
         specifier: workspace:*
-        version: link:../shared
-      pino:
-        specifier: ^9.6.0
-        version: 9.6.0
-      pino-pretty:
-        specifier: ^13.0.0
-        version: 13.0.0
-    devDependencies:
-      typescript:
-        specifier: ^5.8.2
-        version: 5.8.2
-
-  packages/shared:
-    devDependencies:
-      typescript:
-        specifier: ^5.8.2
-        version: 5.8.2
-
-  services/restful-api:
-    dependencies:
-      '@monorepo-packages/db':
+        version: link:../../ts-packages/logger
+      '@ts-packages/shared':
         specifier: workspace:*
-        version: link:../../packages/db
-      '@monorepo-packages/logger':
-        specifier: workspace:*
-        version: link:../../packages/logger
-      '@monorepo-packages/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
-      '@monorepo-services/user':
-        specifier: workspace:*
-        version: link:../user
+        version: link:../../ts-packages/shared
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -98,20 +63,20 @@ importers:
         specifier: ^5.8.2
         version: 5.8.2
 
-  services/user:
+  apps/ts-user:
     dependencies:
-      '@monorepo-packages/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@monorepo-packages/logger':
-        specifier: workspace:*
-        version: link:../../packages/logger
-      '@monorepo-packages/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@prisma/client':
         specifier: 6.5.0
         version: 6.5.0(prisma@6.5.0(typescript@5.8.2))(typescript@5.8.2)
+      '@ts-packages/db':
+        specifier: workspace:*
+        version: link:../../ts-packages/db
+      '@ts-packages/logger':
+        specifier: workspace:*
+        version: link:../../ts-packages/logger
+      '@ts-packages/shared':
+        specifier: workspace:*
+        version: link:../../ts-packages/shared
       kysely:
         specifier: ^0.27.6
         version: 0.27.6
@@ -147,7 +112,63 @@ importers:
         specifier: ^5.8.2
         version: 5.8.2
 
+  ts-packages/db:
+    dependencies:
+      '@ts-packages/logger':
+        specifier: workspace:*
+        version: link:../logger
+      '@ts-packages/shared':
+        specifier: workspace:*
+        version: link:../shared
+      kysely:
+        specifier: ^0.27.6
+        version: 0.27.6
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.11
+        version: 22.13.11
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.2
+
+  ts-packages/logger:
+    dependencies:
+      '@ts-packages/shared':
+        specifier: workspace:*
+        version: link:../shared
+      pino:
+        specifier: ^9.6.0
+        version: 9.6.0
+      pino-pretty:
+        specifier: ^13.0.0
+        version: 13.0.0
+    devDependencies:
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.2
+
+  ts-packages/shared:
+    devDependencies:
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.2
+
 packages:
+
+  '@bufbuild/protobuf@2.3.0':
+    resolution: {integrity: sha512-WK6zH4MtBp/uesX8KGCnwDDRVnEVHUvwjsigKXcSR57Oo8Oyv1vRS9qyUlSP+6KWRl5z8tNAU5qpf3QodeVYxA==}
+
+  '@connectrpc/connect-node@2.0.2':
+    resolution: {integrity: sha512-33Ut3SRkb6SugpwVCtXXRvUrOdtiyG6z6d5+eijBOLOI75sw1tDCwcs0o/9WL3rUj1M08dLUrPmJB47fjpv6EA==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.2.0
+      '@connectrpc/connect': 2.0.2
+
+  '@connectrpc/connect@2.0.2':
+    resolution: {integrity: sha512-xZuylIUNvNlH52e/4eQsZvY4QZyDJRtEFEDnn/yBrv5Xi5ZZI/p8X+GAHH35ucVaBvv9u7OzHZo8+tEh1EFTxA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.2.0
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -1052,6 +1073,17 @@ packages:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
 snapshots:
+
+  '@bufbuild/protobuf@2.3.0': {}
+
+  '@connectrpc/connect-node@2.0.2(@bufbuild/protobuf@2.3.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.3.0))':
+    dependencies:
+      '@bufbuild/protobuf': 2.3.0
+      '@connectrpc/connect': 2.0.2(@bufbuild/protobuf@2.3.0)
+
+  '@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.3.0)':
+    dependencies:
+      '@bufbuild/protobuf': 2.3.0
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:

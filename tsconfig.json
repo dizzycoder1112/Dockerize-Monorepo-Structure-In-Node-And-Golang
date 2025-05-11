@@ -11,15 +11,15 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@monorepo-packages/shared/*": ["packages/shared/src/*"],
-      "@monorepo-packages/db": ["packages/db/src/index.ts"],
-      "@monorepo-packages/logger": ["packages/logger/src/index.ts"],
-      "@monorepo-services/user": ["services/user/src/index.ts"]
+      "@ts-packages/shared/*": ["ts-packages/shared/src/*"],
+      "@ts-packages/db": ["ts-packages/db/src/index.ts"],
+      "@ts-packages/logger": ["ts-packages/logger/src/index.ts"],
+      "@apps/user": ["apps/user/src/index.ts"]
     }
   },
   "include": [
-    "packages/**/*",
-    "services/**/*"
+    "ts-packages/**/*",
+    "apps/**/*"
   ],
   "exclude": [
     "**/*.spec.ts",
