@@ -10,9 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
-    "db:migrate:create": "pnpx prisma migrate dev --create-only",
-    "db:migrate:deploy": "pnpx prisma migrate deploy",
-    "db:generate": "pnpx prisma generate"
+    "start:dev": "NODE_ENV=local nodemon -r tsconfig-paths/register ./src/index.ts",
+    "start:prod": "NODE_ENV=production node ./dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -28,10 +27,14 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.3.0",
+    "@connectrpc/connect": "^2.0.2",
+    "@connectrpc/connect-node": "^2.0.2",
+    "@prisma/client": "6.5.0",
     "@ts-packages/db": "workspace:*",
     "@ts-packages/logger": "workspace:*",
     "@ts-packages/shared": "workspace:*",
-    "@prisma/client": "6.5.0",
+    "@ts-packages/grpc": "workspace:*",
     "kysely": "^0.27.6",
     "pg": "^8.14.1",
     "znv": "^0.4.0",

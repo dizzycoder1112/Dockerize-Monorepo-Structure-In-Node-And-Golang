@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      prettier:
+        specifier: ^3.5.3
+        version: 3.5.3
 
   apps/ts-restful-api:
     dependencies:
@@ -25,6 +29,9 @@ importers:
       '@ts-packages/db':
         specifier: workspace:*
         version: link:../../ts-packages/db
+      '@ts-packages/grpc':
+        specifier: workspace:*
+        version: link:../../ts-packages/grpc
       '@ts-packages/logger':
         specifier: workspace:*
         version: link:../../ts-packages/logger
@@ -65,12 +72,24 @@ importers:
 
   apps/ts-user:
     dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@connectrpc/connect':
+        specifier: ^2.0.2
+        version: 2.0.2(@bufbuild/protobuf@2.3.0)
+      '@connectrpc/connect-node':
+        specifier: ^2.0.2
+        version: 2.0.2(@bufbuild/protobuf@2.3.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.3.0))
       '@prisma/client':
         specifier: 6.5.0
         version: 6.5.0(prisma@6.5.0(typescript@5.8.2))(typescript@5.8.2)
       '@ts-packages/db':
         specifier: workspace:*
         version: link:../../ts-packages/db
+      '@ts-packages/grpc':
+        specifier: workspace:*
+        version: link:../../ts-packages/grpc
       '@ts-packages/logger':
         specifier: workspace:*
         version: link:../../ts-packages/logger
@@ -130,6 +149,18 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.8.2
+
+  ts-packages/grpc:
+    dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@connectrpc/connect':
+        specifier: ^2.0.2
+        version: 2.0.2(@bufbuild/protobuf@2.3.0)
+      '@connectrpc/connect-node':
+        specifier: ^2.0.2
+        version: 2.0.2(@bufbuild/protobuf@2.3.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.3.0))
 
   ts-packages/logger:
     dependencies:
@@ -867,6 +898,11 @@ packages:
 
   postgres-range@1.1.4:
     resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
+
+  prettier@3.5.3:
+    resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   prisma@6.5.0:
     resolution: {integrity: sha512-yUGXmWqv5F4PByMSNbYFxke/WbnyTLjnJ5bKr8fLkcnY7U5rU9rUTh/+Fja+gOrRxEgtCbCtca94IeITj4j/pg==}
@@ -1744,6 +1780,8 @@ snapshots:
   postgres-interval@3.0.0: {}
 
   postgres-range@1.1.4: {}
+
+  prettier@3.5.3: {}
 
   prisma@6.5.0(typescript@5.8.2):
     dependencies:
