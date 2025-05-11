@@ -7,6 +7,10 @@
     "ts-packages/*"
   ],
   "scripts": {
-    "build": "pnpm -r run build"
+    "build": "pnpm -r run build",
+    "buf:gen": "buf generate"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
   }
 }

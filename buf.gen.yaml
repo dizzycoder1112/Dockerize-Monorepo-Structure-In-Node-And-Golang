@@ -1,0 +1,14 @@
+version: v1
+plugins:
+  # - name: go
+  #   out: go-packages/grpc
+  #   opt: paths=source_relative
+  # - name: go-grpc
+  #   out: go-packages/grpc
+  #   opt: paths=source_relative
+  - name: es
+    out: ts-packages/grpc/src
+    opt: target=ts
+  - name: connect-es
+    out: ts-packages/grpc/src
+    opt: target=ts
