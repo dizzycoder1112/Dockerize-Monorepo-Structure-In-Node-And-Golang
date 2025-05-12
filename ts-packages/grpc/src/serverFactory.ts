@@ -3,6 +3,7 @@ import type { ConnectRouter } from '@connectrpc/connect';
 import { Greeter } from './proto/hello_pb';
 import type { HelloRequest, HelloReply } from './proto/hello_pb';
 import { ElizaService } from './proto/eliza_pb';
+import { GrpcServer } from './types';
 
 export interface GrpcServerOptions {
   greeterImpl?: {
@@ -22,9 +23,8 @@ export function createGrpcRoutes(options: GrpcServerOptions) {
   };
 }
 
-export function createGrpcServer(options: GrpcServerOptions) {
-  const handler = connectNodeAdapter({
+export function createGrpcServer(options: GrpcServerOptions): GrpcServer {
+  return connectNodeAdapter({
     routes: createGrpcRoutes(options),
   });
-  return handler;
 }

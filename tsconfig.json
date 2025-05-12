@@ -6,36 +6,26 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "lib": [
-      "DOM",
-      "ESNext.Object",
-      "ES2022"
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@ts-packages/shared/*": [
-        "ts-packages/shared/src/*"
-      ],
-      "@ts-packages/db": [
-        "ts-packages/db/src/index.ts"
-      ],
-      "@ts-packages/logger": [
-        "ts-packages/logger/src/index.ts"
-      ],
-      "@ts-packages/grpc": [
-        "ts-packages/grpc/src/index.ts"
-      ],
-      "@apps/user": [
-        "apps/user/src/index.ts"
-      ]
-    }
+    "lib": ["DOM", "ESNext.Object", "ES2022"],
+    "baseUrl": "."
+    // "paths": {
+    //   "@ts-packages/shared/*": [
+    //     "ts-packages/shared/src/*"
+    //   ],
+    //   "@ts-packages/db": [
+    //     "ts-packages/db/src/index.ts"
+    //   ],
+    //   "@ts-packages/logger": [
+    //     "ts-packages/logger/src/index.ts"
+    //   ],
+    //   "@ts-packages/grpc": [
+    //     "ts-packages/grpc/src/index.ts"
+    //   ],
+    //   "@apps/user": [
+    //     "apps/user/src/index.ts"
+    //   ]
+    // }
   },
-  "include": [
-    "ts-packages/**/*",
-    "apps/**/*"
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "node_modules"
-  ]
+  "include": ["ts-packages/**/*", "apps/**/*"],
+  "exclude": ["**/*.spec.ts", "node_modules"]
 }
