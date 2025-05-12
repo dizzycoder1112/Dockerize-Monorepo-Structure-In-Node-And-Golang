@@ -10,24 +10,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
-    "start:dev": "NODE_ENV=local nodemon -r tsconfig-paths/register ./src/index.ts",
+    "start:dev": "NODE_ENV=local tsx watch --clear-screen=false -r tsconfig-paths/register ./src/index.ts",
     "start:prod": "NODE_ENV=production node ./dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
-  "devDependencies": {
-    "@types/node": "^22.13.11",
-    "@types/pg": "^8.11.11",
-    "nodemon": "^3.1.9",
-    "prisma": "6.5.0",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.2"
-  },
   "dependencies": {
-    "@prisma/client": "6.5.0",
     "@ts-packages/db": "workspace:*",
     "@ts-packages/grpc": "workspace:*",
     "@ts-packages/logger": "workspace:*",
@@ -36,5 +26,12 @@
     "pg": "^8.14.1",
     "znv": "^0.4.0",
     "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.11",
+    "@types/pg": "^8.11.11",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.2"
   }
 }

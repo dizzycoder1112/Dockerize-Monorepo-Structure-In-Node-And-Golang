@@ -1,4 +1,5 @@
 {
+  "packageManager": "pnpm@8.9.0",
   "name": "monorepo-template",
   "private": true,
   "version": "1.0.0",
@@ -7,10 +8,17 @@
     "ts-packages/*"
   ],
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "turbo run build",
+    "start:dev": "concurrently \"turbo run watch:clean --parallel\" \"turbo run start:dev\"",
+    "watch:clean": "turbo run watch:clean",
     "buf:gen": "buf generate"
   },
   "devDependencies": {
-    "prettier": "^3.5.3"
+    "@types/blessed": "^0.1.25",
+    "blessed": "^0.1.81",
+    "child_process": "^1.0.2",
+    "concurrently": "^9.1.2",
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.3"
   }
 }

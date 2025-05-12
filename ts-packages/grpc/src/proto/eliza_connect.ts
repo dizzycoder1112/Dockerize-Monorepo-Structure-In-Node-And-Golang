@@ -17,8 +17,15 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ConverseRequest, ConverseResponse, IntroduceRequest, IntroduceResponse, SayRequest, SayResponse } from "./eliza_pb.js";
-import { MethodKind } from "@bufbuild/protobuf";
+import {
+  ConverseRequest,
+  ConverseResponse,
+  IntroduceRequest,
+  IntroduceResponse,
+  SayRequest,
+  SayResponse,
+} from './eliza_pb';
+import { MethodKind } from '@bufbuild/protobuf';
 
 /**
  * ElizaService provides a way to talk to Eliza, a port of the DOCTOR script
@@ -31,7 +38,7 @@ import { MethodKind } from "@bufbuild/protobuf";
  * @generated from service connectrpc.eliza.v1.ElizaService
  */
 export const ElizaService = {
-  typeName: "connectrpc.eliza.v1.ElizaService",
+  typeName: 'connectrpc.eliza.v1.ElizaService',
   methods: {
     /**
      * Say is a unary RPC. Eliza responds to the prompt with a single sentence.
@@ -39,7 +46,7 @@ export const ElizaService = {
      * @generated from rpc connectrpc.eliza.v1.ElizaService.Say
      */
     say: {
-      name: "Say",
+      name: 'Say',
       I: SayRequest,
       O: SayResponse,
       kind: MethodKind.Unary,
@@ -52,7 +59,7 @@ export const ElizaService = {
      * @generated from rpc connectrpc.eliza.v1.ElizaService.Converse
      */
     converse: {
-      name: "Converse",
+      name: 'Converse',
       I: ConverseRequest,
       O: ConverseResponse,
       kind: MethodKind.BiDiStreaming,
@@ -64,11 +71,10 @@ export const ElizaService = {
      * @generated from rpc connectrpc.eliza.v1.ElizaService.Introduce
      */
     introduce: {
-      name: "Introduce",
+      name: 'Introduce',
       I: IntroduceRequest,
       O: IntroduceResponse,
       kind: MethodKind.ServerStreaming,
     },
-  }
+  },
 } as const;
-

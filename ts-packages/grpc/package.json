@@ -2,10 +2,15 @@
   "name": "@ts-packages/grpc",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./dist & tsc -p tsconfig.prod.json"
+    "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
+    "watch:clean": "rm -rf ./dist && tsc -p tsconfig.prod.json --watch"
   },
   "keywords": [],
   "author": "",
