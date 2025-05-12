@@ -1,10 +1,10 @@
-import { GreeterClient } from '@ts-packages/grpc';
 import { UserRepository } from './user.repository';
+import { RepositoryDeps } from './types';
 
 export class RepositoryFactory {
-  constructor(private userClient: GreeterClient) {}
+  constructor(private deps: RepositoryDeps) {}
 
   getUserRepository() {
-    return new UserRepository(this.userClient);
+    return new UserRepository(this.deps.userClient);
   }
 }

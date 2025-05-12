@@ -6,6 +6,6 @@ const greeterClient = createGreeterClient({
   baseUrl: 'http://localhost:8080',
 });
 
-const repositoryFactory = new RepositoryFactory(greeterClient);
+const repositoryFactory = new RepositoryFactory({ userClient: greeterClient });
 
 export const userService = new UserService(repositoryFactory);

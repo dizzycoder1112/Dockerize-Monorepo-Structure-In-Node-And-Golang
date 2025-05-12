@@ -1,7 +1,7 @@
-import { createGreeterClient } from '@ts-packages/grpc';
+import { GreeterClient } from '@ts-packages/grpc';
 
 export class UserRepository {
-  constructor(private client: ReturnType<typeof createGreeterClient>) {}
+  constructor(private client: GreeterClient) {}
 
   async sayHello(args: { name: string }) {
     return this.client.sayHello(args);
