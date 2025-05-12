@@ -17,15 +17,6 @@ importers:
       '@apps/ts-user':
         specifier: workspace:*
         version: link:../ts-user
-      '@bufbuild/protobuf':
-        specifier: ^2.3.0
-        version: 2.3.0
-      '@connectrpc/connect':
-        specifier: ^2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.3.0)
-      '@connectrpc/connect-node':
-        specifier: ^2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.3.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.3.0))
       '@ts-packages/db':
         specifier: workspace:*
         version: link:../../ts-packages/db
@@ -72,15 +63,6 @@ importers:
 
   apps/ts-user:
     dependencies:
-      '@bufbuild/protobuf':
-        specifier: ^2.3.0
-        version: 2.3.0
-      '@connectrpc/connect':
-        specifier: ^2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.3.0)
-      '@connectrpc/connect-node':
-        specifier: ^2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.3.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.3.0))
       '@prisma/client':
         specifier: 6.5.0
         version: 6.5.0(prisma@6.5.0(typescript@5.8.2))(typescript@5.8.2)
@@ -161,6 +143,13 @@ importers:
       '@connectrpc/connect-node':
         specifier: ^2.0.2
         version: 2.0.2(@bufbuild/protobuf@2.3.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.3.0))
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.11
+        version: 22.13.11
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.2
 
   ts-packages/logger:
     dependencies:

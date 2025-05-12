@@ -1,24 +1,15 @@
-import { connectNodeAdapter } from '@connectrpc/connect-node';
 import { createServer } from 'http2';
-import type { ConnectRouter } from '@connectrpc/connect';
+import { createGrpcServer } from '@ts-packages/grpc';
 
-import { Greeter, HelloRequest } from '@ts-packages/grpc/src/proto/hello_pb';
 
-function routes(router: ConnectRouter) {
-  router.service(Greeter, {
-    sayHello: (req: HelloRequest) => {
-      console.log(req.name);
-      return {
-        message: `You said ${req.name}`,
-      };
-    },
-  });
-}
 
 async function main() {
-  const handler = connectNodeAdapter({
-    routes,
+  const handler = createGrpcServer({
+    greeterImpl: {
+      sayHello: (req) => ({ message: `You said ${req.name}` }),
+    },
   });
+  
 
   const server = createServer(handler);
 
