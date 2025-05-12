@@ -11,7 +11,8 @@
     "build": "turbo run build",
     "start:dev": "concurrently \"turbo run watch:clean --parallel\" \"turbo run start:dev\"",
     "watch:clean": "turbo run watch:clean",
-    "buf:gen": "buf generate"
+    "buf:gen": "buf generate",
+    "log-tool": "./log-tool.sh"
   },
   "devDependencies": {
     "@types/blessed": "^0.1.25",

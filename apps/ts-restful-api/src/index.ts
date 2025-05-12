@@ -4,14 +4,11 @@ import { Server } from 'node:http';
 import { logger } from '@ts-packages/logger';
 import routerV1 from './routes/v1';
 import { traceMiddleware } from './middleware';
-import { aaa } from 'ts-packages/db/src';
 
 const { PORT } = config;
 
 async function bootstrap() {
   const app = express();
-
-  console.log(aaa);
 
   app.use(traceMiddleware);
   app.use('/api/v1', routerV1);
