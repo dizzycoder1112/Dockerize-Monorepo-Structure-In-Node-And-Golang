@@ -1,0 +1,15 @@
+FROM node:22.4.1
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+# 複製 monorepo 根的依賴檔
+COPY . .
+
+# 安裝 workspace 依賴
+RUN pnpm install
+
+
+# 開發指令
+CMD ["pnpm", "run", "--filter", "@apps/ts-user", "start:dev"]

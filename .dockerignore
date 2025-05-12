@@ -4,3 +4,5 @@
 .git
 .env
 .turbo
+/tmp
+**/tmp

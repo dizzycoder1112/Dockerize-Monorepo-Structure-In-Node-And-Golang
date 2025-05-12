@@ -13,18 +13,33 @@ services:
     networks:
       - app-network
 
-  # go-hello:
-  #   build:
-  #     context: ./apps/go-hello
-  #     dockerfile: Dockerfile.dev
-  #   expose:
-  #     - '3000'
-  #   env_file:
-  #     - ./apps/go-hello/.env
-  #   volumes:
-  #     - ./apps/go-hello:/app
-  #   networks:
-  #     - app-network
+  ts-user:
+    build:
+      context: ./
+      dockerfile: apps/ts-user/Dockerfile.dev
+    expose:
+      - '3000'
+    env_file:
+      - ./apps/ts-user/.env
+    volumes:
+      - ./apps/ts-user/src:/app/apps/ts-user/src
+      - ./ts-packages:/app/ts-packages
+    networks:
+      - app-network
+
+  go-hello:
+    build:
+      context: .
+      dockerfile: ./apps/go-hello/Dockerfile.dev
+    expose:
+      - '3000'
+    env_file:
+      - ./apps/go-hello/.env
+    volumes:
+      - ./apps/go-hello:/app/apps/go-hello
+      - ./go-packages:/app/go-packages
+    networks:
+      - app-network
 
 networks:
   app-network:

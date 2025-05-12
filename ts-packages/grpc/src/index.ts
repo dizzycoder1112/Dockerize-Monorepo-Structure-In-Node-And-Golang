@@ -6,4 +6,3 @@ export * as helloProto from './proto/hello_pb';
 // export * as elizaProto from './proto/eliza_pb';
 export * as helloConnect from './proto/hello_connect';
 // export * as elizaConnect from './proto/eliza_connect';
-export const a = '真的會搞欸';
