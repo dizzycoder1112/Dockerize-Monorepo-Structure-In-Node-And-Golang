@@ -1,11 +1,12 @@
 import { connectNodeAdapter } from '@connectrpc/connect-node';
 import type { ConnectRouter } from '@connectrpc/connect';
 import { Greeter } from './proto/hello_pb';
+import type { HelloRequest, HelloReply } from './proto/hello_pb';
 import { ElizaService } from './proto/eliza_pb';
 
 export interface GrpcServerOptions {
   greeterImpl?: {
-    sayHello: (req: any) => any;
+    sayHello: (req: HelloRequest) => Promise<HelloReply>;
   };
   elizaImpl?: Record<string, any>;
 }
