@@ -67,12 +67,15 @@ watch the logs by using log-tool
 ```bash
 pnpm run log-tool
 ```
+![Screenshot 2025-05-13 at 20 39 44](https://github.com/user-attachments/assets/00c495aa-d560-43f5-bdad-be9148a0c7ed)
 
 ### 3️⃣ Build All Packages
 
 ```
 pnpm run build
 ```
+
+
 
 ## Else
 
