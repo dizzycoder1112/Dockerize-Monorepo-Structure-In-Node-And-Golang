@@ -4,24 +4,19 @@ Welcome to the **ultimate monorepo template** — designed for **high-performanc
 
 > ✨ Perfect for microservices, modular APIs, or scaling teams with shared utilities.
 
----
-
 ## ⚡️ Key Features
 
----
+1. Dockerize Monorepo Structure could be implemented by containers, keep the local environment clean and consistent with the production environment.
 
-1. Dockerize Monorepo Structure could be implemented by containers, keep the local environment clean and consistent with the production environment.(to be implemented).
+2. Watching the packages changes, it could keep builded files as needed and hot reload.
 
-2. Turbo repo could be used to manage the monorepo structure, it could keep builded files as needed and hot reload.(to be implemented).
+3. Dependency Injection and Factory Pattern could be used to manage the dependencies of the services, let the program more flexible and easy to test.
 
-3. Dependency Injection and Factory Pattern could be used to manage the dependencies of the services.
-
-4. Apps CLI tools shows each app's logs in terminal by selecting app.(to be implemented).
+4. log-tool CLI tools shows each app's logs in terminal by selecting app.
 
 ## 📂 Project Structure
 
 ```
-
 root/
 ├── ts-packages/
 │ └── shared/
@@ -57,30 +52,36 @@ root/
 pnpm install
 ```
 
+### 2️⃣ Start in Development
+
+⚠️caution: please ensure docker is installed and running.
+
+📝description: this dev mode was powered by docker continaer, and watch the packages changes to rebuild and restart the services by turbo.
+
+```bash
+pnpm run start:dev
+```
+
+watch the logs by using log-tool
+
+```bash
+pnpm run log-tool
+```
+
+### 3️⃣ Build All Packages
+
+```
+pnpm run build
+```
+
+## Else
+
 ### GRPC generate
 
 ```bash
 brew install bufbuild/buf/buf
 pnpm setup
 pnpm run buf:gen
-```
-
-2️⃣ Build All Packages
-
-```
-pnpm run build
-```
-
-3️⃣ Start API in Development
-
-```bash
-pnpm --filter @monorepo-services/api run start:dev
-```
-
-4️⃣ Start API in Production
-
-```
-pnpm --filter @monorepo-services/api run start:prod
 ```
 
 ## 💻 Contribution
