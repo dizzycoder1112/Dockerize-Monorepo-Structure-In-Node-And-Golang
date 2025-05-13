@@ -55,7 +55,9 @@ done'
 
 # 啟動 tmux session
 
-tmux new-session -d -s "$SESSION" bash -c "$left_cmd"
-tmux split-window -h -p 90 -t "$SESSION" bash -c "$right_cmd"
-tmux select-pane -t 0
-tmux attach -t "$SESSION"
+tmux new-session -d -s $SESSION bash -c "$left_cmd"
+tmux split-window -v -p 70 -t $SESSION bash -c "$right_cmd"
+tmux select-pane -t $SESSION:0.0
+# 設置 Ctrl+C 快捷鍵來退出
+tmux bind-key -n C-c kill-session
+tmux attach-session -t $SESSION
