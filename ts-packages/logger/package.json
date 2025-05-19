@@ -10,7 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
-    "watch:clean": "rm -rf ./dist && tsc -p tsconfig.prod.json --watch"
+    "watch": "tsc -p tsconfig.prod.json --watch"
   },
   "keywords": [],
   "author": "",

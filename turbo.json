@@ -6,7 +6,8 @@
       "cache": false,
       "persistent": true
     },
-    "watch:clean": {
+    "watch": {
+      "dependsOn": ["^build"],
       "persistent": true
     },
     "build": {

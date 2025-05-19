@@ -9,8 +9,8 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "start:dev": "docker compose -f docker-compose.dev.yml up -d --build && pnpm run watch:clean",
-    "watch:clean": "turbo run watch:clean",
+    "start:dev": "docker compose -f docker-compose.dev.yml up -d --build && pnpm run watch",
+    "watch": "turbo run watch",
     "buf:gen": "buf generate",
     "log-tool": "./log-tool.sh"
   },
