@@ -1,5 +1,4 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
+import { AsyncLocalStorage } from "node:async_hooks";
 
 interface TraceContext {
   traceId: string;

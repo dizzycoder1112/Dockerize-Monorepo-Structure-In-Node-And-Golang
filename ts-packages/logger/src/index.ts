@@ -1,78 +1,32 @@
-import { pino } from 'pino'
-// import { holdemConfig as config } from '../../configs'
+import type { Logger } from "@ts-packages/shared/types";
 
-// const { LOG_LEVEL } = config
+import { LoggerStrategy } from "./strategies";
 
-export const logger = pino({
-  level: 'debug',
-  timestamp: pino.stdTimeFunctions.isoTime,
-  serializers: {
-    error: pino.stdSerializers.errWithCause,
+export * from "./strategies";
 
-  },
-  transport: {
-    targets: [
-      {
-        target: 'pino-pretty',
-        options: {
-          ignore: 'pid,hostname',
-          colorize: true,
-          translateTime: 'SYS:standard',
-        },
-      },
-    ],
-  },
-})
+type LogContext = Record<string, unknown>;
+type LogArg = string | LogContext;
 
+export function createLogger(strategies: LoggerStrategy[]): Logger {
+  function callStrategies(level: string, contextOrMessage: LogArg, message?: string) {
+    if (typeof contextOrMessage === "string") {
+      // Only message
+      strategies.forEach(s => s.log(level, contextOrMessage));
+    } else if (typeof message === "string") {
+      // context + message
+      strategies.forEach(s => s.log(level, message, contextOrMessage));
+    } else {
+      // Only context
+      strategies.forEach(s => s.log(level, undefined, contextOrMessage));
+    }
+  }
 
-
-// import { pino } from "pino";
-// import { config } from "@src/config";
-
-// // Define a transport for writing to the error log file and another for console
-// const fileTransport = pino.transport({
-//   targets: [
-//     {
-//       target: "pino/file",
-//       level: "error",
-//       options: {
-//         destination: "./logs/error.log",
-//         translateTime: "SYS:standard",
-//         mkdir: true,
-//       },
-//     },
-//     {
-//       target: "pino/file",
-//       options: {
-//         destination: "./logs/combined.log",
-//         mkdir: true,
-//       },
-//     },
-//     {
-//       target: "pino-pretty",
-//       level: "info",
-//       options: {
-//         colorize: true, // Enable colorization for console output
-//         translateTime: "SYS:standard",
-//         ignore: "pid,hostname", // Ignore pid and hostname
-//       },
-//     },
-//   ],
-// });
-
-// const logger = pino(
-//   {
-//     level: config.LOG_LEVEL,
-//     timestamp: pino.stdTimeFunctions.isoTime,
-//   },
-//   fileTransport
-// );
-
-// Example usage of the logger
-// logger.info({ hah: "hah" }, "This is an info message");
-// logger.error("This is an error message");
-
-// export default logger;
-
-// export type Logger = typeof logger;
-
+  return {
+    info: (contextOrMessage: LogArg, message?: string) => callStrategies("info", contextOrMessage, message),
+    warn: (contextOrMessage: LogArg, message?: string) => callStrategies("warn", contextOrMessage, message),
+    error: (contextOrMessage: LogArg, message?: string) => callStrategies("error", contextOrMessage, message),
+    debug: (contextOrMessage: LogArg, message?: string) => callStrategies("debug", contextOrMessage, message),
+    // Optionally, expose the generic log API:
+    log: (level: string, contextOrMessage: LogArg, message?: string) => callStrategies(level, contextOrMessage, message)
+  };
+}

@@ -11,15 +11,4 @@ export class UserService {
     return this.userRepo.sayHello(args);
   }
 
-  async getUser(id: number) {
-    return this.userRepo.findById(id);
-  }
-
-  async getUsers() {
-    return this.userRepo.findAll();
-  }
-
-  async createUser(nickname: string) {
-    return this.userRepo.create(nickname);
-  }
 }

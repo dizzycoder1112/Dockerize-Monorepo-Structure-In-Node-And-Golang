@@ -7,6 +7,11 @@
     "apps/*",
     "ts-packages/*"
   ],
+  "pnpm": {
+    "overrides": {
+      "@types/pg": "8.15.2"
+    }
+  },
   "scripts": {
     "build": "turbo run build",
     "start:dev": "docker compose -f docker-compose.dev.yml up -d --build && pnpm run watch",
@@ -18,8 +23,8 @@
     "@types/blessed": "^0.1.25",
     "blessed": "^0.1.81",
     "child_process": "^1.0.2",
-    "concurrently": "^9.1.2",
     "prettier": "^3.5.3",
-    "turbo": "^2.5.3"
+    "turbo": "^2.5.3",
+    "typescript": "^5.8.2"
   }
 }

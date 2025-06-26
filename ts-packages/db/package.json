@@ -18,11 +18,12 @@
   "packageManager": "pnpm@10.6.5",
   "devDependencies": {
     "@types/node": "^22.13.11",
+    "@types/pg": "^8.11.11",
     "typescript": "^5.8.2"
   },
   "dependencies": {
     "@ts-packages/shared": "workspace:*",
-    "@ts-packages/logger": "workspace:*",
-    "kysely": "^0.27.6"
+    "kysely": "^0.27.6",
+    "pg": "^8.14.1"
   }
 }

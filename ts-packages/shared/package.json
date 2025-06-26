@@ -7,7 +7,7 @@
   "exports": {
     "./constants": "./dist/constants/index.js",
     "./utils": "./dist/utils/index.js",
-    ".": "./dist/index.js"
+    "./types": "./dist/types/index.js"
   },
   "scripts": {
     "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
@@ -16,8 +16,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.6.5",
-  "devDependencies": {
-    "typescript": "^5.8.2"
-  }
+  "packageManager": "pnpm@10.6.5"
 }
