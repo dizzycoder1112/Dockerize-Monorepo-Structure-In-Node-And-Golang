@@ -1,7 +1,7 @@
 import config from './config';
 import express from 'express';
 import { Server } from 'node:http';
-import { logger } from '@ts-packages/logger';
+import { logger } from './libs/logger';
 import routerV1 from './routes/v1';
 import { traceMiddleware } from './middleware';
 
