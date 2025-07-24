@@ -2,7 +2,7 @@ services:
   ts-restful-api:
     build:
       context: ./
-      dockerfile: apps/ts-restful-api/Dockerfile.dev
+      dockerfile: apps/ts-restful-api/Dockerfile.local
     expose:
       - '3000'
     env_file:
@@ -16,7 +16,7 @@ services:
   ts-user:
     build:
       context: ./
-      dockerfile: apps/ts-user/Dockerfile.dev
+      dockerfile: apps/ts-user/Dockerfile.lcoal
     expose:
       - '3000'
     env_file:
@@ -30,7 +30,7 @@ services:
   go-hello:
     build:
       context: .
-      dockerfile: ./apps/go-hello/Dockerfile.dev
+      dockerfile: ./apps/go-hello/Dockerfile.local
     expose:
       - '3000'
     env_file:
