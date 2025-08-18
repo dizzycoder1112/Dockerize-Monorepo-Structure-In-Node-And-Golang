@@ -16,7 +16,7 @@ services:
   ts-user:
     build:
       context: ./
-      dockerfile: apps/ts-user/Dockerfile.lcoal
+      dockerfile: apps/ts-user/Dockerfile.local
     expose:
       - '3000'
     env_file:
