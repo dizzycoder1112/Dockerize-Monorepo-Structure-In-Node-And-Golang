@@ -1,0 +1,33 @@
+{
+  "name": "@packages/rabbitmq",
+  "version": "1.0.0",
+  "description": "RabbitMQ producer and consumer factory",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "test": "echo \"No tests for @packages/rabbitmq\"",
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": ["rabbitmq", "amqp", "queue"],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.6.5",
+  "dependencies": {
+    "amqplib": "^0.10.9"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.7",
+    "@types/node": "^24.6.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.2"
+  }
+}
