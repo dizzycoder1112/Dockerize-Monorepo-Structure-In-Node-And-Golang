@@ -1,0 +1,14 @@
+FROM golang:1.25.1
+
+WORKDIR /app
+
+COPY . .
+
+WORKDIR /app/apps/go-counter-server
+
+RUN go install github.com/air-verse/air@v1.61.7
+
+RUN go mod download
+
+
+CMD ["air", "-c", ".air.toml"]
