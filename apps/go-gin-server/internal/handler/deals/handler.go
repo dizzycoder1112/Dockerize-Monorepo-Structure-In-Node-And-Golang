@@ -1,15 +1,20 @@
 package deals
 
 import (
+	"go-gin-server/internal/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Handler struct{}
+type Handler struct {
+	dealService *service.DealService
+}
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(dealService *service.DealService) *Handler {
+	return &Handler{
+		dealService: dealService,
+	}
 }
 
 // GET /deals.json - 取得交易列表
