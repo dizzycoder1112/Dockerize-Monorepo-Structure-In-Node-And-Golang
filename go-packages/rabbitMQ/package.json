@@ -1,0 +1,10 @@
+{
+  "name": "@packages/rabbitmq-go",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "go build ./...",
+    "vet": "go vet ./...",
+    "test": "echo \"No test configured\"",
+    "verify": "go mod verify"
+  }
+}
