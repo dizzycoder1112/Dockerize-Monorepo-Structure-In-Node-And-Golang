@@ -1,0 +1,48 @@
+replicaCount: 1
+app: app-name
+containers:
+  port: 3000
+  image:
+    repository: registry.digitalocean.com/organization/project
+    pullPolicy: Always
+    tag: '.dev'
+  env: # set [] if env is empty
+    - name: NODE_ENV
+      value: 'development'
+    - name: PORT
+      value: '3000'
+    - name: ALLOW_ORIGIN
+      value: 'http://localhost:3000'
+  secretsFrom: infisical-app-secrets
+
+infisical:
+  envSlug: dev
+  projectId: 'infisical-project-id'
+
+# nodeSelector:
+#   doks.digitalocean.com/node-pool: "pool-258gs845a" select the pool
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+service:
+  enabled: true
+  protocol: TCP
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  host: your.domain.io
+
+# HPA configuration
+hpa:
+  enabled: false
+  minReplicas: 1 # minimum 1 Pod
+  maxReplicas: 5 # the maximum scaling to 5 Pods
+  targetCPUUtilizationPercentage: 90 # CPU reach request 90% would be scaling
+  targetMemoryUtilizationPercentage: 100 # mem request 100% would be scaling

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app }}
+  labels:
+    app: {{ .Values.app }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app }}
+  template:
+    metadata:
+      annotations:
+        timestamp: {{ now | quote }}
+      labels:
+        app: {{ .Values.app }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.app }}
+          image: {{ .Values.containers.image.repository }}:{{ printf "%s%s" .Chart.Version (default "" .Values.containers.image.tag) }}
+          imagePullPolicy: {{ .Values.containers.image.pullPolicy }}
+          {{- if .Values.containers.port }}
+          ports:
+            - containerPort: {{ .Values.containers.port }}
+          {{- end }}
+          {{- if .Values.containers.secretsFrom }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.containers.secretsFrom }}
+          {{- end }}
+          env:
+            {{- toYaml .Values.containers.env | nindent 12 }}
+          resources:
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+ 
