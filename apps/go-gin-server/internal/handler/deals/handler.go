@@ -17,18 +17,18 @@ func NewHandler(dealService *service.DealService) *Handler {
 	}
 }
 
-// GET /deals.json - 取得交易列表
+// GET /deals.json - Get list of deals
 func (h *Handler) GetDeals(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "GET /deals.json - 取得交易列表",
+		"message": "GET /deals.json - Get list of deals",
 		"mock":    true,
 	})
 }
 
-// GET /uncompleted_deals.json - 取得未完成交易
+// GET /uncompleted_deals.json - Get uncompleted deals
 func (h *Handler) GetUncompletedDeals(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "GET /uncompleted_deals.json - 取得未完成交易",
+		"message": "GET /uncompleted_deals.json - Get uncompleted deals",
 		"mock":    true,
 	})
 }

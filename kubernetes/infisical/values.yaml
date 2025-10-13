@@ -1,0 +1,49 @@
+# installation
+# use command:
+# helm install infisical infisical-helm-charts/infisical \                                                                                                                ─╯
+#     --namespace infisical \
+#     --create-namespace \
+#     -f kubernetes/infisical/values.yaml
+
+mongodb:
+  enabled: false
+
+redis:
+  enabled: false
+
+postgresql:
+  enabled: false
+
+backendEnvironmentVariables:
+  # PostgreSQL 連接
+  DB_CONNECTION_URI: postgresql://<db-user>:<db-password>@<db-host>:<db-port>/<db-name> #hint: weedza-dev data-center
+
+  # Redis 連接
+  REDIS_URL: 'redis://<redis-host>:<redis-port>/<db>'
+
+  # SMTP 配置（必要）
+  SMTP_HOST: 'sandbox.smtp.mailtrap.io'
+  SMTP_PORT: 2525
+  SMTP_SECURE: 'false'
+  SMTP_FROM_NAME: 'Infisical'
+  SMTP_FROM_ADDRESS: 'user@dizzycoder.xyz'
+  SMTP_USERNAME: 'username'
+  SMTP_PASSWORD: 'password'
+
+  # 站點 URL
+  SITE_URL: 'http://localhost:8080'
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hostName: 'infisical.your.domain' # replace your domain
+  annotations:
+    {}
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"  # if needs HTTPS
+  # tls:
+  #   - secretName: infisical-tls
+  #     hosts:
+  #       - infisical.your-domain.com
+
+mailhog:
+  enabled: false

@@ -7,3 +7,4 @@
 .turbo
 /tmp
 **/tmp
+/kubernetes/secrets

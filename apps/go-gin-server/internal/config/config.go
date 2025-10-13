@@ -37,7 +37,7 @@ func Load() {
 		DBName:      requireEnv("DB_NAME"),
 	}
 
-	// 根據 ENVIRONMENT 自動設定 GIN_MODE
+	// Automatically set GIN_MODE based on ENVIRONMENT
 	if AppConfig.Environment == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
