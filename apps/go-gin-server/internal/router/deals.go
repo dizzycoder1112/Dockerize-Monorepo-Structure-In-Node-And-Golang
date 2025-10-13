@@ -1,14 +1,13 @@
 package router
 
 import (
-	"go-gin-server/internal/handler/deals"
+	handler "go-gin-server/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupDealsRoutes(r *gin.Engine) {
-	handler := deals.NewHandler()
-
-	r.GET("/deals", handler.GetDeals)
-	r.GET("/uncompleted_deals", handler.GetUncompletedDeals)
+func SetupDealsRoutes(r *gin.RouterGroup, h *handler.Handlers) {
+	rg := r.Group("/deals")
+	rg.GET("/", h.Deal.GetDeals)
+	rg.GET("/uncompleted", h.Deal.GetUncompletedDeals)
 }

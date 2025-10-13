@@ -5,6 +5,7 @@ import (
 
 	"go-gin-server/internal/config"
 	"go-gin-server/internal/db"
+	"go-gin-server/internal/handler"
 	"go-gin-server/internal/repository"
 	"go-gin-server/internal/router"
 	"go-gin-server/internal/service"
@@ -24,8 +25,9 @@ func main() {
 
 	repos := repository.NewRepoFactory(database.Q)
 	services := service.NewServiceFactory(repos)
+	handlers := handler.NewHandlerFactory(services)
 
-	r := router.Setup(services)
+	r := router.Setup(handlers)
 
 	log.Printf("🚀 Server starting on port %s", config.AppConfig.Port)
 	if err := r.Run(":" + config.AppConfig.Port); err != nil {

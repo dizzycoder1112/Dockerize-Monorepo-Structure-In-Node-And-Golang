@@ -1,27 +1,26 @@
 package router
 
 import (
-	handlers "go-gin-server/internal/handler"
+	handler "go-gin-server/internal/handler"
 	"go-gin-server/internal/middleware"
-	"go-gin-server/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Setup(services *service.Services) *gin.Engine {
+func Setup(h *handler.Handlers) *gin.Engine {
 	r := gin.New()
 
 	r.Use(gin.Recovery())
 	r.Use(middleware.CORS())
 	r.Use(middleware.Logger())
 
-	healthHandler := handlers.NewHealthHandler()
-	r.GET("/", healthHandler.Index)
-	r.GET("/health", healthHandler.Check)
+	r.GET("/", h.Health.Index)
+	r.GET("/health", h.Health.Check)
 
-
-	SetupDealsRoutes(r)
-	
+	api := r.Group("/api/v1")
+	{
+		SetupDealsRoutes(api, h)
+	}
 
 	return r
 }
