@@ -1,20 +1,22 @@
 import { connect } from 'amqplib';
+import type { Channel, ChannelModel } from 'amqplib';
+
 import { RabbitMQConfig } from './types';
-import type { ChannelModel, Channel } from 'amqplib';
 
 export class RabbitMQConnection {
   private connection: ChannelModel | null = null;
-  private channel: Channel | null = null;
+  private defaultChannel: Channel | null = null;
+  private channels: Map<string, Channel> = new Map(); // Named channels for isolation
   private consumerTags: Map<string, string> = new Map();
   private checkedQueues: Set<string> = new Set(); // Cache for queue existence checks
 
   constructor(
     private config: RabbitMQConfig,
-    private logger: any,
+    private logger: any | Console = console,
   ) {}
 
   async connect(): Promise<void> {
-    if (this.connection && this.channel) {
+    if (this.connection && this.defaultChannel) {
       return;
     }
 
@@ -22,10 +24,10 @@ export class RabbitMQConnection {
       this.logger.info({ url: this.maskUrl(this.config.url) }, 'Connecting to RabbitMQ');
 
       this.connection = await connect(this.config.url);
-      this.channel = await this.connection.createChannel();
+      this.defaultChannel = await this.connection.createChannel();
 
       if (this.config.prefetch) {
-        await this.channel.prefetch(this.config.prefetch);
+        await this.defaultChannel.prefetch(this.config.prefetch);
       }
 
       this.setupConnectionHandlers();
@@ -38,7 +40,7 @@ export class RabbitMQConnection {
   }
 
   private setupConnectionHandlers(): void {
-    if (!this.connection || !this.channel) return;
+    if (!this.connection || !this.defaultChannel) return;
 
     this.connection.on('error', (error) => {
       this.logger.error({ error }, 'RabbitMQ connection error');
@@ -48,20 +50,59 @@ export class RabbitMQConnection {
       this.logger.warn('RabbitMQ connection closed');
     });
 
-    this.channel.on('error', (error) => {
-      this.logger.error({ error }, 'RabbitMQ channel error');
+    this.setupChannelHandlers(this.defaultChannel, 'default');
+  }
+
+  private setupChannelHandlers(channel: Channel, channelId: string): void {
+    channel.on('error', (error) => {
+      this.logger.error({ error, channelId }, 'RabbitMQ channel error');
     });
 
-    this.channel.on('close', () => {
-      this.logger.warn('RabbitMQ channel closed');
+    channel.on('close', () => {
+      this.logger.warn({ channelId }, 'RabbitMQ channel closed');
+      // Remove from map if it's a named channel
+      if (channelId !== 'default') {
+        this.channels.delete(channelId);
+      }
     });
   }
 
-  getChannel(): Channel {
-    if (!this.channel) {
-      throw new Error('Channel not initialized. Call connect() first.');
+  /**
+   * Get a channel by ID
+   * @param channelId - Optional channel ID. If not provided, returns default channel
+   * @returns Channel instance
+   */
+  async getChannel(channelId?: string): Promise<Channel> {
+    // Return default channel if no channelId specified
+    if (!channelId) {
+      if (!this.defaultChannel) {
+        throw new Error('Default channel not initialized. Call connect() first.');
+      }
+      return this.defaultChannel;
     }
-    return this.channel;
+
+    // Check if named channel already exists
+    if (this.channels.has(channelId)) {
+      return this.channels.get(channelId)!;
+    }
+
+    // Create new named channel
+    if (!this.connection) {
+      throw new Error('Connection not initialized. Call connect() first.');
+    }
+
+    this.logger.info({ channelId }, 'Creating new named channel');
+    const channel = await this.connection.createChannel();
+
+    if (this.config.prefetch) {
+      await channel.prefetch(this.config.prefetch);
+    }
+
+    this.setupChannelHandlers(channel, channelId);
+    this.channels.set(channelId, channel);
+
+    this.logger.info({ channelId }, 'Named channel created successfully');
+    return channel;
   }
 
   getLogger(): any {
@@ -71,25 +112,28 @@ export class RabbitMQConnection {
   /**
    * Ensure queue exists (with caching to avoid repeated checks)
    * Only checks once per queue, then caches the result
+   * @param queue - Queue name to check
+   * @param channelId - Optional channel ID to use for checking
    */
-  async ensureQueueExists(queue: string): Promise<void> {
+  async ensureQueueExists(queue: string, channelId?: string): Promise<void> {
     // Check cache first
     if (this.checkedQueues.has(queue)) {
       return;
     }
 
-    if (!this.channel) {
-      throw new Error('Channel not initialized. Call connect() first.');
-    }
+    const channel = await this.getChannel(channelId);
 
     try {
       // Use passive check (doesn't create queue)
-      await this.channel.checkQueue(queue);
+      await channel.checkQueue(queue);
       this.checkedQueues.add(queue);
-      this.logger.debug({ queue }, 'Queue exists - cached for future use');
+      this.logger.debug(
+        { queue, channelId: channelId || 'default' },
+        'Queue exists - cached for future use',
+      );
     } catch (error) {
       this.logger.error(
-        { queue, error },
+        { queue, channelId: channelId || 'default', error },
         'Queue does not exist - consumer must be started first',
       );
       throw new Error(
@@ -120,14 +164,29 @@ export class RabbitMQConnection {
 
   async close(): Promise<void> {
     try {
-      if (this.channel) {
-        await this.channel.close();
-        this.channel = null;
+      // Close all named channels
+      for (const [channelId, channel] of this.channels.entries()) {
+        try {
+          await channel.close();
+          this.logger.debug({ channelId }, 'Named channel closed');
+        } catch (error) {
+          this.logger.error({ error, channelId }, 'Error closing named channel');
+        }
       }
+      this.channels.clear();
+
+      // Close default channel
+      if (this.defaultChannel) {
+        await this.defaultChannel.close();
+        this.defaultChannel = null;
+      }
+
+      // Close connection
       if (this.connection) {
         await this.connection.close();
         this.connection = null;
       }
+
       this.consumerTags.clear();
       this.logger.info('RabbitMQ connection closed');
     } catch (error) {
@@ -137,7 +196,7 @@ export class RabbitMQConnection {
   }
 
   isConnected(): boolean {
-    return this.connection !== null && this.channel !== null;
+    return this.connection !== null && this.defaultChannel !== null;
   }
 
   private maskUrl(url: string): string {
