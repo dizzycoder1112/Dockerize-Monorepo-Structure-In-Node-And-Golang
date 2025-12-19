@@ -8,7 +8,7 @@ export async function consumeQueue<T = unknown>(
   handler: MessageHandler<T>,
   options?: ConsumeOptions & { queueOptions?: QueueOptions },
 ): Promise<string> {
-  const channel = connection.getChannel();
+  const channel = await connection.getChannel(options?.channelId);
   const logger = connection.getLogger();
 
   try {
@@ -26,6 +26,7 @@ export async function consumeQueue<T = unknown>(
             {
               queue,
               messageId: msg.properties.messageId,
+              channelId: options?.channelId || 'default',
             },
             'Processing message',
           );
@@ -41,6 +42,7 @@ export async function consumeQueue<T = unknown>(
               error,
               queue,
               message: msg.content.toString(),
+              channelId: options?.channelId || 'default',
             },
             'Error processing message',
           );
@@ -60,11 +62,11 @@ export async function consumeQueue<T = unknown>(
 
     connection.registerConsumerTag(queue, consumerTag);
 
-    logger.info({ queue, consumerTag }, 'Consumer registered');
+    logger.info({ queue, consumerTag, channelId: options?.channelId || 'default' }, 'Consumer registered');
 
     return consumerTag;
   } catch (error) {
-    logger.error({ error, queue }, 'Failed to register consumer');
+    logger.error({ error, queue, channelId: options?.channelId || 'default' }, 'Failed to register consumer');
     throw error;
   }
 }
@@ -73,7 +75,7 @@ export async function cancelConsumer(
   connection: RabbitMQConnection,
   queue: string,
 ): Promise<void> {
-  const channel = connection.getChannel();
+  const channel = await connection.getChannel();
   const logger = connection.getLogger();
   const consumerTag = connection.getConsumerTag(queue);
 

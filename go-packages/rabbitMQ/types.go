@@ -3,11 +3,14 @@ package rabbitmq
 import amqp "github.com/rabbitmq/amqp091-go"
 
 // Logger interface for custom logging implementations
+// Supports variadic context arguments in two formats:
+// 1. Key-value pairs: "key1", value1, "key2", value2
+// 2. Single map: map[string]any{"key1": value1, "key2": value2}
 type Logger interface {
-	Info(msg string, fields map[string]interface{})
-	Debug(msg string, fields map[string]interface{})
-	Error(msg string, fields map[string]interface{})
-	Warn(msg string, fields map[string]interface{})
+	Info(msg string, context ...any)
+	Debug(msg string, context ...any)
+	Error(msg string, context ...any)
+	Warn(msg string, context ...any)
 }
 
 // Config holds RabbitMQ connection configuration
@@ -36,24 +39,50 @@ func DefaultQueueOptions() QueueOptions {
 	}
 }
 
+// ExchangeOptions represents exchange declaration options
+type ExchangeOptions struct {
+	Type       string // direct, topic, fanout, headers
+	Durable    bool
+	AutoDelete bool
+	Internal   bool
+	NoWait     bool
+	Args       amqp.Table
+}
+
+// DefaultExchangeOptions returns default exchange options
+// Default: topic exchange, durable
+func DefaultExchangeOptions() ExchangeOptions {
+	return ExchangeOptions{
+		Type:       "topic",
+		Durable:    true,
+		AutoDelete: false,
+		Internal:   false,
+		NoWait:     false,
+		Args:       nil,
+	}
+}
+
 // PublishOptions represents message publishing options
 type PublishOptions struct {
-	Persistent   bool
-	Priority     uint8
-	Expiration   string
-	Headers      amqp.Table
-	QueueOptions *QueueOptions
+	Persistent         bool
+	Priority           uint8
+	Expiration         string
+	Headers            amqp.Table
+	QueueOptions       *QueueOptions
+	EnableQueueDeclare bool   // Enable queue declaration (default: false, assume queue already exists)
+	ChannelID          string // Optional channel ID for channel isolation. Empty string uses default channel.
 }
 
 // DefaultPublishOptions returns default publish options
+// By default, queue declaration is disabled (assume queue already exists)
 func DefaultPublishOptions() PublishOptions {
-	queueOpts := DefaultQueueOptions()
 	return PublishOptions{
-		Persistent:   true,
-		Priority:     0,
-		Expiration:   "",
-		Headers:      nil,
-		QueueOptions: &queueOpts,
+		Persistent:         true,
+		Priority:           0,
+		Expiration:         "",
+		Headers:            nil,
+		QueueOptions:       nil,
+		EnableQueueDeclare: false, // Default: don't declare, assume queue exists
 	}
 }
 
@@ -66,7 +95,8 @@ type ConsumeOptions struct {
 	Args          amqp.Table
 	QueueOptions  *QueueOptions
 	RetryStrategy RetryStrategy
-	EnableDLQ     bool // Enable Dead Letter Queue for failed messages
+	EnableDLQ     bool   // Enable Dead Letter Queue for failed messages
+	ChannelID     string // Optional channel ID for channel isolation. Empty string uses default channel.
 }
 
 // MessageHandler is a function type for handling consumed messages

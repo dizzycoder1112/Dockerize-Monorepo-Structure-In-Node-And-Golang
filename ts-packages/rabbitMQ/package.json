@@ -17,7 +17,11 @@
     "build": "tsup",
     "dev": "tsup --watch"
   },
-  "keywords": ["rabbitmq", "amqp", "queue"],
+  "keywords": [
+    "rabbitmq",
+    "amqp",
+    "queue"
+  ],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",

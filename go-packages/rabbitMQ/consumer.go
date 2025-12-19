@@ -13,13 +13,6 @@ func ConsumeQueue(
 	handler MessageHandler,
 	options *ConsumeOptions,
 ) error {
-	channel, err := conn.GetChannel()
-	if err != nil {
-		return err
-	}
-
-	logger := conn.GetLogger()
-
 	// Use default options if not provided
 	if options == nil {
 		options = &ConsumeOptions{
@@ -27,6 +20,13 @@ func ConsumeQueue(
 			Exclusive: false,
 		}
 	}
+
+	channel, err := conn.GetChannel(options.ChannelID)
+	if err != nil {
+		return err
+	}
+
+	logger := conn.GetLogger()
 
 	// Use default queue options if not provided
 	if options.QueueOptions == nil {
@@ -59,9 +59,14 @@ func ConsumeQueue(
 		options.QueueOptions.Args,
 	)
 	if err != nil {
+		channelID := "default"
+		if options.ChannelID != "" {
+			channelID = options.ChannelID
+		}
 		logger.Error("Failed to declare queue", map[string]interface{}{
-			"error": err.Error(),
-			"queue": queue,
+			"error":     err.Error(),
+			"queue":     queue,
+			"channelId": channelID,
 		})
 		return fmt.Errorf("failed to declare queue %s: %w", queue, err)
 	}
@@ -69,9 +74,14 @@ func ConsumeQueue(
 	// Setup retry strategy after queue is declared
 	if options.RetryStrategy != nil {
 		if err := options.RetryStrategy.Setup(channel, queue); err != nil {
+			channelID := "default"
+			if options.ChannelID != "" {
+				channelID = options.ChannelID
+			}
 			logger.Error("Failed to setup retry strategy", map[string]interface{}{
-				"error": err.Error(),
-				"queue": queue,
+				"error":     err.Error(),
+				"queue":     queue,
+				"channelId": channelID,
 			})
 			return fmt.Errorf("failed to setup retry strategy for queue %s: %w", queue, err)
 		}
@@ -88,15 +98,26 @@ func ConsumeQueue(
 		options.Args,
 	)
 	if err != nil {
+		channelID := "default"
+		if options.ChannelID != "" {
+			channelID = options.ChannelID
+		}
 		logger.Error("Failed to start consuming", map[string]interface{}{
-			"error": err.Error(),
-			"queue": queue,
+			"error":     err.Error(),
+			"queue":     queue,
+			"channelId": channelID,
 		})
 		return fmt.Errorf("failed to start consuming queue %s: %w", queue, err)
 	}
 
+	channelID := "default"
+	if options.ChannelID != "" {
+		channelID = options.ChannelID
+	}
+
 	logger.Info("Started consuming queue", map[string]interface{}{
-		"queue": queue,
+		"queue":     queue,
+		"channelId": channelID,
 	})
 
 	// Process messages
@@ -122,7 +143,13 @@ func processMessage(
 	options *ConsumeOptions,
 ) error {
 	logger := conn.GetLogger()
-	channel, err := conn.GetChannel()
+
+	channelID := ""
+	if options != nil {
+		channelID = options.ChannelID
+	}
+
+	channel, err := conn.GetChannel(channelID)
 	if err != nil {
 		return err
 	}
@@ -166,8 +193,9 @@ func processMessage(
 }
 
 // CancelConsumer cancels a consumer by its tag
+// Uses default channel for cancellation
 func CancelConsumer(conn *Connection, consumerTag string) error {
-	channel, err := conn.GetChannel()
+	channel, err := conn.GetChannel("") // Use default channel
 	if err != nil {
 		return err
 	}
