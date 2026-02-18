@@ -15,6 +15,9 @@ containers:
       value: 'http://localhost:3000'
   secretsFrom: infisical-app-secrets
 
+imagePullSecrets:
+  - name: docker-registry-secret
+
 infisical:
   envSlug: dev
   projectId: 'infisical-project-id'
@@ -38,6 +41,11 @@ service:
 ingress:
   enabled: true
   host: your.domain.io
+
+persistence:
+  enabled: false
+  accessMode: ReadWriteOnce
+  size: 2Gi
 
 # HPA configuration
 hpa:
