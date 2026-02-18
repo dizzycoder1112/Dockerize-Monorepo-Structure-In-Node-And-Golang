@@ -1,0 +1,108 @@
+name: Prepare Matrix from Config
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Deployment environment (development/staging/production)"
+        type: string
+        default: "development"
+        required: false
+      services-skip-json:
+        description: "JSON object with skip status for all services"
+        type: string
+        required: true
+    outputs:
+      build-matrix:
+        description: "Build matrix for services"
+        value: ${{ jobs.prepare.outputs.build-matrix }}
+      deploy-matrix:
+        description: "Deploy matrix for services"
+        value: ${{ jobs.prepare.outputs.deploy-matrix }}
+      environment-config:
+        description: "Environment configuration"
+        value: ${{ jobs.prepare.outputs.environment-config }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      build-matrix: ${{ steps.generate-matrix.outputs.build-matrix }}
+      deploy-matrix: ${{ steps.generate-matrix.outputs.deploy-matrix }}
+      environment-config: ${{ steps.generate-matrix.outputs.environment-config }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate deployment matrices
+        id: generate-matrix
+        run: |
+          # Read the configuration file
+          CONFIG_FILE=".github/services-config.json"
+
+          # Get environment configuration
+          ENV="${{ inputs.environment }}"
+
+          # Extract environment config
+          ENV_CONFIG=$(jq -c ".environments.\"$ENV\"" $CONFIG_FILE)
+          echo "Environment config: $ENV_CONFIG"
+          echo "environment-config=$ENV_CONFIG" >> $GITHUB_OUTPUT
+
+          # Get namespace and chart from config
+          NAMESPACE=$(echo $ENV_CONFIG | jq -r '.namespace')
+          CHART=$(jq -r '.defaults.chart' $CONFIG_FILE)
+
+          # Generate build matrix from services list
+          BUILD_SERVICES=$(jq -c '.services' $CONFIG_FILE)
+
+          # Parse skip JSON
+          SKIP_JSON='${{ inputs.services-skip-json }}'
+
+          # Add environment-specific properties and skip flags to each service
+          BUILD_MATRIX=$(echo $BUILD_SERVICES | jq -c \
+            --argjson env "$ENV_CONFIG" \
+            --argjson skip_json "$SKIP_JSON" '
+            map(. + {
+              image: .name,
+              tag: (if $env.tag_suffix == "" then "${VERSION}" else "${VERSION}" + $env.tag_suffix end),
+              skip: ($skip_json[.name] == "true")
+            })
+          ')
+
+          echo "Build matrix: $BUILD_MATRIX"
+          echo "build-matrix=$BUILD_MATRIX" >> $GITHUB_OUTPUT
+
+          # Generate deploy matrix by dynamically building values paths
+          DEPLOY_MATRIX="[]"
+
+          # Iterate through all services
+          for SERVICE in $(echo $BUILD_SERVICES | jq -c '.[]'); do
+            SERVICE_NAME=$(echo $SERVICE | jq -r '.name')
+
+            # Dynamically construct values file path
+            VALUES_PATH="./kubernetes/${ENV}/values.${SERVICE_NAME}.yaml"
+
+            # Check if values file exists
+            if [ ! -f "$VALUES_PATH" ]; then
+              echo "⚠️  Warning: Values file not found for ${SERVICE_NAME} in ${ENV}: ${VALUES_PATH}"
+              echo "⏭️  Skipping ${SERVICE_NAME} for ${ENV} environment"
+              continue
+            fi
+
+            echo "✅ Found values file for ${SERVICE_NAME}: ${VALUES_PATH}"
+
+            # Get skip flag for this service
+            SERVICE_SKIP=$(echo $BUILD_MATRIX | jq -r --arg name "$SERVICE_NAME" '.[] | select(.name == $name) | .skip')
+
+            SERVICE_DEPLOY=$(echo $SERVICE | jq -c --arg chart "$CHART" --arg namespace "$NAMESPACE" --arg values "$VALUES_PATH" --arg skip "$SERVICE_SKIP" '
+              . + {
+                chart: $chart,
+                namespace: $namespace,
+                values: $values,
+                skip: ($skip == "true")
+              }
+            ')
+            DEPLOY_MATRIX=$(echo $DEPLOY_MATRIX | jq -c --argjson service "$SERVICE_DEPLOY" '. + [$service]')
+          done
+
+          echo "Deploy matrix: $DEPLOY_MATRIX"
+          echo "deploy-matrix=$DEPLOY_MATRIX" >> $GITHUB_OUTPUT

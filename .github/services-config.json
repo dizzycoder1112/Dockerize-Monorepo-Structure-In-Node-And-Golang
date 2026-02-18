@@ -1,0 +1,25 @@
+{
+  "services": [
+    {
+      "name": "app",
+      "path": "apps/project-app"
+    }
+  ],
+  "environments": {
+    "development": {
+      "namespace": "project-dev",
+      "tag_suffix": ".dev"
+    },
+    "staging": {
+      "namespace": "project-staging",
+      "tag_suffix": ".staging"
+    },
+    "production": {
+      "namespace": "project",
+      "tag_suffix": ""
+    }
+  },
+  "defaults": {
+    "chart": "./kubernetes"
+  }
+}

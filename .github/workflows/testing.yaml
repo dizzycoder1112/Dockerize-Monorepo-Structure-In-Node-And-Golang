@@ -1,0 +1,52 @@
+name: Testing Workflow
+on:
+  workflow_call:
+
+jobs:
+  test-node:
+    runs-on: ubuntu-latest
+    container:
+      image: node:22.4.1-slim
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run Node/TS tests with Turbo
+        run: |
+          pnpm turbo run test --filter="!*go-*" --filter="!forge-smart-contracts"
+
+  test-forge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: Run Forge build
+        working-directory: apps/forge-evm-smart-contracts
+        run: forge build --sizes
+      - name: Run Forge tests
+        working-directory: apps/forge-evm-smart-contracts
+        run: forge test -vvv
+
+  test-go:
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.25.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Go tests
+        run: |
+          # Find and test all Go projects
+          for dir in apps/go-* services/go-*; do
+            if [ -d "$dir" ] && [ -f "$dir/go.mod" ]; then
+              echo "Testing $dir..."
+              cd "$dir"
+              go mod download
+              go test ./... -v
+              cd - > /dev/null
+            fi
+          done

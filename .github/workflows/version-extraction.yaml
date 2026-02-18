@@ -1,0 +1,25 @@
+name: Extract Version
+on:
+  workflow_call:
+    outputs:
+      version:
+        description: "The extracted version from Chart.yaml"
+        value: ${{ jobs.extract.outputs.version }}
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.appVersion.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install yq
+        run: |
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+      
+      - name: Extract Application Version
+        id: appVersion
+        run: |
+          echo "version=$(cat kubernetes/Chart.yaml | yq '.version')" >> $GITHUB_OUTPUT

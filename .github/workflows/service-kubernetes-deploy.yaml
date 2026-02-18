@@ -1,0 +1,69 @@
+on:
+  workflow_call:
+    inputs:
+      chart:
+        required: true
+        type: string
+      values:
+        required: true
+        type: string
+      namespace:
+        required: true
+        type: string
+      release:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      skip:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      DO_GITHUB_ACTION_K8S_ACCESS_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip }}
+    env:
+      CLUSTER_NAME: k8s-polycoin-do-sgp
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inputs Validation
+        run: |
+          # Versions are expected to follow Semantic Versioning (https://semver.org/)
+          if [[ ! ${{ inputs.version }} =~ ^(latest|v?[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Invalid version format. Please use the format v?X.Y.Z"
+            exit 1
+          fi
+      - uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_GITHUB_ACTION_K8S_ACCESS_TOKEN }}
+      - name: Apply Kubernetes Context
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ env.CLUSTER_NAME }}
+
+      - uses: azure/setup-helm@v4.2.0
+        with:
+          version: "v3.15.4"
+      - name: Deploying Service
+        run: |
+          success=0
+          for i in {1..5}; do
+            helm upgrade --install ${{ inputs.release }} ${{ inputs.chart }} -f ${{ inputs.values }} -n ${{ inputs.namespace }} --wait --timeout 300s && success=1 && break
+            echo "[$i/5] Helm lock, retrying in 60s..."
+            sleep 60
+          done
+          if [ $success -ne 1 ]; then
+            echo "Helm upgrade failed after 5 attempts"
+            exit 1
+          fi
+      - name: Helm Test Deployment
+        if: ${{ success() }}
+        run: |
+          helm test ${{ inputs.release }} -n ${{ inputs.namespace }} --timeout 300s

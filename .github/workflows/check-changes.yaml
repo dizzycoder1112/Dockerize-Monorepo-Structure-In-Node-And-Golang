@@ -1,0 +1,143 @@
+name: Check Changes Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      comparison-mode:
+        description: 'Mode for comparison: "tag" for production (compare with previous tag), "branch" for development (compare with base branch), or "commit" for direct commit comparison'
+        required: true
+        type: string
+      environment:
+        description: "Environment to check (development, staging, or production)"
+        required: true
+        type: string
+      base-branch:
+        description: 'Base branch for PR comparison (only used when comparison-mode is "branch")'
+        required: false
+        type: string
+        default: "master"
+      base-commit:
+        description: 'Base commit SHA for comparison (only used when comparison-mode is "commit")'
+        required: false
+        type: string
+    outputs:
+      services-skip-json:
+        description: "JSON object with skip status for all services"
+        value: ${{ jobs.check-changes.outputs.services-skip-json }}
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services-skip-json: ${{ steps.check-services.outputs.services-skip-json }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Get full history for comparison
+
+      - name: Setup comparison base
+        id: setup
+        run: |
+          if [ "${{ inputs.comparison-mode }}" == "tag" ]; then
+            # Get the previous tag
+            PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+            if [ -z "$PREVIOUS_TAG" ]; then
+              echo "⚠️ No previous tag found, will deploy all services"
+              echo "has_base=false" >> $GITHUB_OUTPUT
+            else
+              echo "📊 Comparing with previous tag: $PREVIOUS_TAG"
+              echo "Current tag: ${{ github.ref_name }}"
+              echo "has_base=true" >> $GITHUB_OUTPUT
+              echo "base=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+            fi
+          elif [ "${{ inputs.comparison-mode }}" == "commit" ]; then
+            # Use the provided base commit
+            BASE_COMMIT="${{ inputs.base-commit }}"
+            if [ -z "$BASE_COMMIT" ]; then
+              echo "⚠️ No base commit provided, will deploy all services"
+              echo "has_base=false" >> $GITHUB_OUTPUT
+            else
+              echo "📊 Comparing with base commit: $BASE_COMMIT"
+              echo "has_base=true" >> $GITHUB_OUTPUT
+              echo "base=$BASE_COMMIT" >> $GITHUB_OUTPUT
+            fi
+          else
+            # Fetch the base branch
+            BASE_BRANCH="${{ inputs.base-branch }}"
+            echo "Fetching base branch: $BASE_BRANCH"
+            git fetch origin "$BASE_BRANCH":"refs/remotes/origin/$BASE_BRANCH"
+
+            # Compare with the merge base to get accurate changes
+            MERGE_BASE=$(git merge-base "origin/$BASE_BRANCH" HEAD)
+            echo "Merge base: $MERGE_BASE"
+            echo "has_base=true" >> $GITHUB_OUTPUT
+            echo "base=$MERGE_BASE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check all services dynamically
+        id: check-services
+        run: |
+          # Read all services from config
+          SERVICES=$(jq -c '.services[]' .github/services-config.json)
+
+          # Initialize JSON result
+          SKIP_JSON="{}"
+
+          # Get changed files if base exists
+          if [ "${{ steps.setup.outputs.has_base }}" == "true" ]; then
+            BASE="${{ steps.setup.outputs.base }}"
+            CHANGED_FILES=$(git diff --name-only "$BASE"...HEAD)
+            echo "📋 Changed files:"
+            echo "$CHANGED_FILES"
+            echo ""
+          fi
+
+          # Loop through all services
+          for SERVICE in $SERVICES; do
+            SERVICE_NAME=$(echo $SERVICE | jq -r '.name')
+            SERVICE_PATH=$(echo $SERVICE | jq -r '.path')
+            DEPENDENCIES=$(echo $SERVICE | jq -r '.dependencies // [] | join("\\|^")')
+
+            if [ "${{ steps.setup.outputs.has_base }}" == "false" ]; then
+              SKIP="false"
+              echo "🚀 No base to compare, will deploy ${SERVICE_NAME}"
+            else
+              # Build grep pattern (service path + dependencies)
+              GREP_PATTERN="^${SERVICE_PATH}/"
+              if [ -n "$DEPENDENCIES" ]; then
+                GREP_PATTERN="${GREP_PATTERN}\|^${DEPENDENCIES}"
+              fi
+
+              # Check for changes
+              if echo "$CHANGED_FILES" | grep -q "$GREP_PATTERN"; then
+                SKIP="false"
+                echo "✅ Service code changed: ${SERVICE_NAME}"
+              elif echo "$CHANGED_FILES" | grep -q "^kubernetes/templates/"; then
+                SKIP="false"
+                echo "✅ Kubernetes templates changed, will deploy ${SERVICE_NAME}"
+              elif echo "$CHANGED_FILES" | grep -qF "kubernetes/${{ inputs.environment }}/values.${SERVICE_NAME}.yaml"; then
+                SKIP="false"
+                echo "✅ Values file changed for ${SERVICE_NAME} in ${{ inputs.environment }}"
+              else
+                SKIP="true"
+                echo "⏭️  No relevant changes for ${SERVICE_NAME}, will skip"
+              fi
+            fi
+
+            # Add to JSON
+            SKIP_JSON=$(echo $SKIP_JSON | jq --arg name "$SERVICE_NAME" --arg skip "$SKIP" '. + {($name): $skip}')
+          done
+
+          # Output JSON (compressed to single line for GitHub Actions)
+          SKIP_JSON_COMPACT=$(echo $SKIP_JSON | jq -c '.')
+          echo "services-skip-json=$SKIP_JSON_COMPACT" >> $GITHUB_OUTPUT
+          echo ""
+          echo "📊 Skip status (formatted):"
+          echo "$SKIP_JSON" | jq '.'
+
+      - name: Show summary
+        if: steps.setup.outputs.has_base == 'true'
+        run: |
+          echo ""
+          echo "📝 Summary of changes:"
+          git diff --stat "${{ steps.setup.outputs.base }}"...HEAD
