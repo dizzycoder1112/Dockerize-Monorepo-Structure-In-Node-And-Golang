@@ -1,0 +1,22 @@
+name: DigitalOcean Garbage Collection Execution
+
+on:
+  workflow_call:
+    secrets:
+      DO_IMAGE_REGISTRY_TOKEN:
+        required: true
+
+jobs:
+  do-garbage-collect-execution:
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_IMAGE_REGISTRY_TOKEN }}
+          version: 1.141.0
+
+      - name: Run registry garbage collection
+        run: |
+          # Try using yes command repeatedly
+          doctl registry garbage-collection start polycoin --include-untagged-manifests --force

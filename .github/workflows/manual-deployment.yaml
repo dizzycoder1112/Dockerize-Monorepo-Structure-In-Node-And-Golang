@@ -1,0 +1,135 @@
+name: Manual Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        required: true
+        default: "development"
+        type: choice
+        options:
+          - production
+          - staging
+          - development
+      app:
+        description: "Application to deploy"
+        required: true
+        type: choice
+        options:
+          - all
+
+run-name: Manual Deployment (${{ github.event.inputs.app }}@${{ github.event.inputs.environment }}) from ${{ github.ref_name }}
+
+jobs:
+  # Step 1: Run tests
+  testing:
+    uses: ./.github/workflows/testing.yaml
+
+  # Step 2: Prepare skip flags based on app selection
+  prepare-skip-flags:
+    runs-on: ubuntu-latest
+    outputs:
+      services-skip-json: ${{ steps.flags.outputs.services-skip-json }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate skip flags JSON
+        id: flags
+        run: |
+          APP="${{ github.event.inputs.app }}"
+
+          # Read all services from config
+          SERVICES=$(jq -c '.services[]' .github/services-config.json)
+
+          # Build JSON based on selection
+          SKIP_JSON="{}"
+          for SERVICE in $SERVICES; do
+            SERVICE_NAME=$(echo $SERVICE | jq -r '.name')
+
+            if [ "$APP" = "all" ]; then
+              SKIP="false"
+            elif [ "$SERVICE_NAME" = "$APP" ]; then
+              SKIP="false"
+            else
+              SKIP="true"
+            fi
+
+            SKIP_JSON=$(echo $SKIP_JSON | jq --arg name "$SERVICE_NAME" --arg skip "$SKIP" '. + {($name): $skip}')
+          done
+
+          # Output JSON (compressed to single line for GitHub Actions)
+          SKIP_JSON_COMPACT=$(echo $SKIP_JSON | jq -c '.')
+          echo "services-skip-json=$SKIP_JSON_COMPACT" >> $GITHUB_OUTPUT
+          echo "📊 Skip status (formatted):"
+          echo "$SKIP_JSON" | jq '.'
+
+  # Step 3: Read configuration and generate matrices
+  prepare-matrix:
+    needs: [testing, prepare-skip-flags]
+    uses: ./.github/workflows/prepare-matrix.yaml
+    with:
+      environment: ${{ github.event.inputs.environment }}
+      services-skip-json: ${{ needs.prepare-skip-flags.outputs.services-skip-json }}
+
+  # Step 4: Display configuration for verification
+  display-config:
+    needs: prepare-matrix
+    uses: ./.github/workflows/display-config.yaml
+    with:
+      build-matrix: ${{ needs.prepare-matrix.outputs.build-matrix }}
+      deploy-matrix: ${{ needs.prepare-matrix.outputs.deploy-matrix }}
+      environment-config: ${{ needs.prepare-matrix.outputs.environment-config }}
+
+  # Step 5: Version extraction
+  version-extraction:
+    uses: ./.github/workflows/version-extraction.yaml
+
+  # Step 6: Build and push using dynamic matrix
+  build-and-push:
+    needs: [testing, prepare-matrix, version-extraction]
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.prepare-matrix.outputs.build-matrix) }}
+    uses: ./.github/workflows/build-and-push.yaml
+    with:
+      serviceName: ${{ matrix.service.name }}
+      image: ${{ matrix.service.image }}
+      version: ${{ needs.version-extraction.outputs.version }}
+      sha: ${{ github.sha }}
+      path: ${{ matrix.service.path }}
+      tag: ${{ github.event.inputs.environment == 'production' && needs.version-extraction.outputs.version || (github.event.inputs.environment == 'staging' && format('{0}.staging', needs.version-extraction.outputs.version)) || format('{0}.dev', needs.version-extraction.outputs.version) }}
+      env: ${{ github.event.inputs.environment }}
+      skip: ${{ matrix.service.skip }}
+    secrets: inherit
+
+  # Step 7: Deploy using dynamic matrix
+  deploy:
+    needs: [prepare-matrix, version-extraction, build-and-push]
+    strategy:
+      max-parallel: 1
+      matrix:
+        service: ${{ fromJson(needs.prepare-matrix.outputs.deploy-matrix) }}
+    uses: ./.github/workflows/service-kubernetes-deploy.yaml
+    with:
+      chart: ${{ matrix.service.chart }}
+      values: ${{ matrix.service.values }}
+      namespace: ${{ matrix.service.namespace }}
+      release: ${{ matrix.service.name }}
+      path: ${{ matrix.service.path }}
+      version: ${{ needs.version-extraction.outputs.version }}
+      skip: ${{ matrix.service.skip }}
+    secrets: inherit
+
+  # Summary
+  summary:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Manual deployment summary
+        run: |
+          echo "✅ Manual deployment completed successfully!"
+          echo ""
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Application: ${{ github.event.inputs.app }}"
+          echo "Branch: ${{ github.ref_name }}"

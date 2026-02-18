@@ -1,0 +1,36 @@
+name: Display Configuration
+
+on:
+  workflow_call:
+    inputs:
+      build-matrix:
+        description: 'Build matrix JSON'
+        type: string
+        required: true
+      deploy-matrix:
+        description: 'Deploy matrix JSON'
+        type: string
+        required: true
+      environment-config:
+        description: 'Environment configuration JSON'
+        type: string
+        required: true
+
+jobs:
+  display:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display build matrix
+        run: |
+          echo "🔨 Build Matrix:"
+          echo '${{ inputs.build-matrix }}' | jq '.'
+
+      - name: Display deploy matrix
+        run: |
+          echo "🚀 Deploy Matrix:"
+          echo '${{ inputs.deploy-matrix }}' | jq '.'
+
+      - name: Display environment config
+        run: |
+          echo "⚙️ Environment Config:"
+          echo '${{ inputs.environment-config }}' | jq '.'

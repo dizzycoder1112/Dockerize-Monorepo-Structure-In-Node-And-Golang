@@ -1,0 +1,71 @@
+on:
+  workflow_call:
+    inputs:
+      serviceName:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      sha:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+      env:
+        required: true
+        type: string
+      skip:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      DO_IMAGE_REGISTRY_TOKEN:
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: registry.digitalocean.com
+          username: champerwu.work@gmail.com
+          password: ${{ secrets.DO_IMAGE_REGISTRY_TOKEN }}
+
+      - name: Build Parameters Setup
+        id: inputs
+        run: |
+          # Versions are expected to follow Semantic Versioning (https://semver.org/)
+          if [[ ! ${{ inputs.version }} =~ ^(latest|[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Invalid version format. Please use the format X.Y.Z"
+            exit 1
+          fi
+      - name: Docker Compose Build
+        if: ${{ success() }}
+        run: |
+          docker compose build \
+            --build-arg GIT_COMMIT_SHA=${{ inputs.sha }} \
+            --build-arg APP_VERSION=${{ inputs.version }} \
+            --build-arg ENVIRONMENT=${{ inputs.env }} \
+            ${{ inputs.serviceName }}
+
+      - name: Tag Docker Image
+        if: ${{ success() }}
+        run: |
+          docker tag ${{ inputs.serviceName }} registry.digitalocean.com/polycoin/${{ inputs.image }}:${{ inputs.tag }}
+
+      - name: Push Docker Image
+        if: ${{ success() }}
+        run: |
+          docker push registry.digitalocean.com/polycoin/${{ inputs.image }}:${{ inputs.tag }}

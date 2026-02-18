@@ -1,0 +1,82 @@
+name: Development Deployment
+
+on:
+  pull_request:
+    branches:
+      - release/*
+    types:
+      - opened
+      - synchronize
+      - labeled
+
+run-name: Development Deployment PR #${{ github.event.pull_request.number }}
+
+jobs:
+  # Step 1: Run tests
+  testing:
+    uses: ./.github/workflows/testing.yaml
+
+  # Step 2: Check what changed
+  check-changes:
+    uses: ./.github/workflows/check-changes.yaml
+    with:
+      comparison-mode: "branch"
+      environment: development
+      base-branch: ${{ github.event.pull_request.base.ref || 'master' }}
+
+  # Step 3: Read configuration and generate matrices
+  prepare-matrix:
+    needs: [testing, check-changes]
+    uses: ./.github/workflows/prepare-matrix.yaml
+    with:
+      environment: development
+      services-skip-json: ${{ needs.check-changes.outputs.services-skip-json }}
+
+  # Step 4: Display configuration for verification
+  display-config:
+    needs: prepare-matrix
+    uses: ./.github/workflows/display-config.yaml
+    with:
+      build-matrix: ${{ needs.prepare-matrix.outputs.build-matrix }}
+      deploy-matrix: ${{ needs.prepare-matrix.outputs.deploy-matrix }}
+      environment-config: ${{ needs.prepare-matrix.outputs.environment-config }}
+
+  # Step 5: Version extraction
+  version-extraction:
+    uses: ./.github/workflows/version-extraction.yaml
+
+  # Step 6: Build and push using dynamic matrix
+  build-and-push:
+    needs: [testing, prepare-matrix, version-extraction]
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.prepare-matrix.outputs.build-matrix) }}
+    uses: ./.github/workflows/build-and-push.yaml
+    with:
+      serviceName: ${{ matrix.service.name }}
+      image: ${{ matrix.service.image }}
+      version: ${{ needs.version-extraction.outputs.version }}
+      sha: ${{ github.event.pull_request.head.sha }}
+      path: ${{ matrix.service.path }}
+      tag: ${{ needs.version-extraction.outputs.version }}.dev
+      env: development
+      skip: ${{ matrix.service.skip }}
+    secrets: inherit
+
+  # Step 7: Deploy using dynamic matrix
+  deploy:
+    needs: [prepare-matrix, version-extraction, build-and-push]
+    strategy:
+      max-parallel: 1
+      matrix:
+        service: ${{ fromJson(needs.prepare-matrix.outputs.deploy-matrix) }}
+    uses: ./.github/workflows/service-kubernetes-deploy.yaml
+    with:
+      chart: ${{ matrix.service.chart }}
+      values: ${{ matrix.service.values }}
+      namespace: ${{ matrix.service.namespace }}
+      release: ${{ matrix.service.name }}
+      path: ${{ matrix.service.path }}
+      version: ${{ needs.version-extraction.outputs.version }}
+      skip: ${{ matrix.service.skip }}
+    secrets: inherit
