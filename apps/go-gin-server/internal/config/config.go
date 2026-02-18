@@ -10,7 +10,7 @@ import (
 
 type Config struct {
 	Port        string
-	Environment string
+	Env string
 	DBHost      string
 	DBPort      string
 	DBUser      string
@@ -29,7 +29,7 @@ func Load() {
 
 	AppConfig = &Config{
 		Port:        requireEnv("PORT"),
-		Environment: requireEnv("ENVIRONMENT"),
+		Env: requireEnv("ENV"),
 		DBHost:      requireEnv("DB_HOST"),
 		DBPort:      requireEnv("DB_PORT"),
 		DBUser:      requireEnv("DB_USER"),
@@ -38,14 +38,14 @@ func Load() {
 	}
 
 	// Automatically set GIN_MODE based on ENVIRONMENT
-	if AppConfig.Environment == "production" {
+	if AppConfig.Env == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
 		gin.SetMode(gin.DebugMode)
 	}
 
-	log.Printf("✅ Config loaded: Environment=%s, Port=%s, GIN_MODE=%s",
-		AppConfig.Environment, AppConfig.Port, gin.Mode())
+	log.Printf("✅ Config loaded: Env=%s, Port=%s, GIN_MODE=%s",
+		AppConfig.Env, AppConfig.Port, gin.Mode())
 }
 
 func requireEnv(key string) string {
