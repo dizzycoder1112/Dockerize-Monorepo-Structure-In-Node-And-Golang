@@ -12,4 +12,4 @@ RUN pnpm install
 
 
 # 開發指令
-CMD ["pnpm", "run", "--filter", "@apps/ts-user", "start:dev"]
+CMD ["pnpm", "run", "--filter", "@apps/ts-grpc-demo", "start:dev"]

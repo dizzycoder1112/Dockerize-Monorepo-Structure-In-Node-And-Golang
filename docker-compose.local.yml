@@ -13,31 +13,17 @@ services:
     networks:
       - app-network
 
-  ts-user:
+  ts-grpc-demo:
     build:
       context: ./
-      dockerfile: apps/ts-user/Dockerfile.local
+      dockerfile: apps/ts-grpc-demo/Dockerfile.local
     expose:
       - '3000'
     env_file:
-      - ./apps/ts-user/.env
+      - ./apps/ts-grpc-demo/.env
     volumes:
-      - ./apps/ts-user/src:/app/apps/ts-user/src
+      - ./apps/ts-grpc-demo/src:/app/apps/ts-grpc-demo/src
       - ./ts-packages:/app/ts-packages
-    networks:
-      - app-network
-
-  go-hello:
-    build:
-      context: .
-      dockerfile: ./apps/go-hello/Dockerfile.local
-    expose:
-      - '3000'
-    env_file:
-      - ./apps/go-hello/.env
-    volumes:
-      - ./apps/go-hello:/app/apps/go-hello
-      - ./go-packages:/app/go-packages
     networks:
       - app-network
 

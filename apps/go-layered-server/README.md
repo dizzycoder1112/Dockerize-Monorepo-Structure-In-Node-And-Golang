@@ -1,150 +1,72 @@
-# Go Counter Server
+# go-layered-server
 
-Rails Counter Server 的 Go 重寫版本，使用 Gin 框架。
+A 3-layer (handler → service → repository) Go HTTP server built on Gin. Pairs with `go-ddd-server` to showcase two backend architectures inside the same monorepo.
 
-## 📁 專案結構
+## Quickstart
 
-```
-go-layered-server/
-├── cmd/
-│   └── main.go                 # 應用程式入口
-├── internal/                   # 私有應用程式代碼
-│   ├── config/                 # 配置管理
-│   │   └── config.go
-│   ├── middleware/             # 中介軟體
-│   │   ├── cors.go            # CORS 設定
-│   │   └── logger.go          # 請求日誌
-│   ├── handlers/               # HTTP 處理器 (Controller)
-│   │   ├── health.go          # Health check
-│   │   ├── authentication.go  # 認證相關 (TODO)
-│   │   ├── girls.go           # Girls API (TODO)
-│   │   └── ...                # 其他 controllers
-│   ├── models/                 # 資料模型 (Phase 2)
-│   ├── services/               # 業務邏輯層 (Phase 3)
-│   ├── repository/             # 資料存取層 (Phase 2)
-│   └── router/                 # 路由設定
-│       └── router.go
-├── pkg/                        # 公開函式庫
-│   └── response/               # 統一回應格式
-│       └── response.go
-├── mock/                       # Mock 資料 (Phase 1)
-├── .env
-├── .env.example
-├── go.mod
-└── go.sum
-```
-
-## 🚀 快速開始
-
-### 1. 安裝依賴
 ```bash
-go mod download
+go run ./cmd/main.go
+# server on :8080, in-memory repositories
 ```
 
-### 2. 設定環境變數
+Set `DATABASE_URL` to flip to the pgx-backed Postgres backend:
+
 ```bash
-cp .env.example .env
-# 編輯 .env 檔案設定你的環境變數
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/dev?sslmode=disable go run ./cmd/main.go
 ```
 
-### 3. 執行開發伺服器
-```bash
-# 使用 air (hot reload)
-air -c .air.toml
+Schema (when using Postgres):
 
-# 或直接執行
-go run cmd/main.go
+```sql
+CREATE TABLE deals (
+  id          UUID PRIMARY KEY,
+  title       TEXT        NOT NULL,
+  amount      BIGINT      NOT NULL,
+  status      TEXT        NOT NULL DEFAULT 'open',
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 ```
 
-### 4. 測試 API
-```bash
-# Health check
-curl http://localhost:8080/health
+## Layout
 
-# 根路徑
-curl http://localhost:8080/
+```
+apps/go-layered-server/
+├── cmd/main.go                    composition root
+├── internal/
+│   ├── config/                    env loader (getEnv with fallbacks)
+│   ├── infra/postgres/            NewPool + QueryLogger tracer + DBConn
+│   ├── repository/
+│   │   ├── interfaces.go          DealRepository, Repositories, TxRunner
+│   │   ├── types.go               DealRow normalized struct
+│   │   ├── errors.go              sentinel errors (ErrNotFound, ...)
+│   │   ├── memory/                in-memory backend (default)
+│   │   └── postgres/              pgx-backed backend
+│   ├── service/                   DealServiceDeps pattern, ctx threading
+│   ├── handler/                   gin handlers, BindJSON + sentinel mapping
+│   ├── middleware/                cors, logger, Middlewares struct
+│   ├── router/                    per-resource route files
+│   └── factory/                   composition root: NewMemoryRepo / NewPostgresRepo / NewService / NewHandler / NewMiddleware
+└── pkg/response/                  unified API response shape + BindJSON
 ```
 
-## 📋 開發階段
+## API
 
-### Phase 1: Mock API (進行中)
-- [x] 基礎架構建立
-- [x] Health check endpoint
-- [ ] 15 個 GET APIs with mock data
+| Method | Path                          | Notes                            |
+|--------|-------------------------------|----------------------------------|
+| GET    | `/health`                     | liveness probe                   |
+| GET    | `/api/v1/deals`               | list                             |
+| GET    | `/api/v1/deals/:id`           |                                  |
+| POST   | `/api/v1/deals`               | `{title, amount}`                |
+| PATCH  | `/api/v1/deals/:id`           | `{title, amount}`                |
+| POST   | `/api/v1/deals/:id/close`     | runs through `TxRunner`          |
+| DELETE | `/api/v1/deals/:id`           |                                  |
 
-### Phase 2: 資料庫整合 (待開發)
-- [ ] GORM + PostgreSQL
-- [ ] Models 定義
-- [ ] Repository 層
-- [ ] 真實資料查詢
+Validation errors return `400` with snake_cased field names. Unknown IDs return `404`. Invalid status transitions / args return `400`/`409`.
 
-### Phase 3: 完整 CRUD (待開發)
-- [ ] POST APIs
-- [ ] PATCH APIs
-- [ ] DELETE APIs
-- [ ] WebSocket 支援
+## Notes
 
-## 🏗️ 架構說明
-
-### Clean Architecture 分層
-
-1. **Handlers** (Presentation Layer)
-   - 處理 HTTP 請求和回應
-   - 參數驗證
-   - 呼叫 Service 層
-
-2. **Services** (Business Logic Layer)
-   - 核心業務邏輯
-   - 資料轉換
-   - 呼叫 Repository 層
-
-3. **Repository** (Data Access Layer)
-   - 資料庫操作
-   - CRUD 操作封裝
-
-4. **Models** (Domain Layer)
-   - 資料結構定義
-   - 業務實體
-
-### Middleware
-
-- **CORS**: 跨域請求處理
-- **Logger**: 請求日誌記錄
-- **Auth**: JWT 認證 (Phase 2)
-
-### Response 格式
-
-統一的 API 回應格式：
-
-```json
-{
-  "success": true,
-  "message": "optional message",
-  "data": { ... }
-}
-```
-
-錯誤回應：
-```json
-{
-  "success": false,
-  "error": "error message"
-}
-```
-
-## 🔧 技術棧
-
-- **框架**: Gin
-- **ORM**: GORM (Phase 2)
-- **資料庫**: PostgreSQL (Phase 2)
-- **認證**: JWT (Phase 2)
-- **環境變數**: godotenv
-- **Hot Reload**: Air
-
-## 📚 API 文件
-
-詳細 API 文件請參考 [CLAUDE.md](../../CLAUDE.md)
-
-## 🤝 貢獻
-
-此專案是 rails-counter-server 的 Go 重寫版本。
+- `RepoFactory.UseTransaction` degrades to a direct `fn(repos)` call in memory mode — service code is identical across both backends.
+- `QueryLogger` (the pgx tracer in `infra/postgres/tracer.go`) logs every query in dev/staging at Debug, only slow queries (≥200 ms) at Warn in production.
+- Composition root lives in `internal/factory/` — one file per layer. Add new services / repos by extending these factories rather than editing `cmd/main.go`.
+- Logger comes from `go-packages/logger` via a `replace` directive — same pattern any monorepo Go app can copy.

@@ -1,5 +1,5 @@
 {
-  "name": "@apps/ts-user",
+  "name": "@apps/ts-grpc-demo",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",

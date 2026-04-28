@@ -4,10 +4,10 @@ Open-source monorepo template showcasing Dockerized Node + Go services across mu
 
 ## Apps
 
-- `apps/go-hello` — minimal Go hello-world
 - `apps/go-layered-server` — 3-layer / layered architecture (handler → service → repository) — refactored from `go-gin-server` template; uses pgx + custom `QueryLogger` tracer, `RepoFactory.UseTransaction` for multi-repo atomicity, `BindJSON` with snake_case validation errors
 - `apps/go-ddd-server` — DDD 4-layer (domain / app / infra / interfaces) — extracted from tenderland `go-ops-server`, generic `Order` aggregate
-- `apps/ts-restful-api`, `apps/ts-user` — Node / TypeScript apps
+- `apps/ts-restful-api` — Node / TypeScript REST API (Express)
+- `apps/ts-grpc-demo` — Node / TypeScript gRPC server consuming `ts-packages/grpc` + `proto/hello.proto` (renamed from `ts-user`; kept as the live consumer of the buf pipeline)
 
 ## `go-layered-server` upgrade — done
 
