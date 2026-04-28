@@ -16,17 +16,13 @@
     "build": "turbo run build",
     "start:dev": "docker compose -f docker-compose.local.yml up -d --build && pnpm run watch",
     "watch": "turbo run watch",
-    "buf:gen": "cd proto && buf generate",
-    "log-tool": "./log-tool.sh"
+    "buf:gen": "cd proto && buf generate"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.66.1",
     "@bufbuild/protoc-gen-es": "2.3.0",
     "@connectrpc/protoc-gen-connect-es": "^1.7.0",
-    "@types/blessed": "^0.1.25",
     "@types/node": "^25.6.0",
-    "blessed": "^0.1.81",
-    "child_process": "^1.0.2",
     "prettier": "^3.5.3",
     "turbo": "^2.5.3",
     "typescript": "^5.8.2"
