@@ -12,18 +12,18 @@ func Logger() gin.HandlerFunc {
 		start := time.Now()
 		path := c.Request.URL.Path
 		method := c.Request.Method
+		rawQuery := c.Request.URL.RawQuery
+		ip := c.ClientIP()
 
 		c.Next()
 
-		duration := time.Since(start)
+		durationMs := float64(time.Since(start).Nanoseconds()) / 1e6
 		statusCode := c.Writer.Status()
 
-		log.Printf("[%s] %s %s - %d (%v)",
-			method,
-			path,
-			c.ClientIP(),
-			statusCode,
-			duration,
-		)
+		query := ""
+		if rawQuery != "" {
+			query = " ?" + rawQuery
+		}
+		log.Printf("[%d] %s %s%s ip=%s dur=%.2fms", statusCode, method, path, query, ip, durationMs)
 	}
 }

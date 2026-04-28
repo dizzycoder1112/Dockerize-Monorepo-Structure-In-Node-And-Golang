@@ -17,15 +17,13 @@ func (h *HealthHandler) Check(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":    "ok",
 		"timestamp": time.Now().Format(time.RFC3339),
-		"service":   "go-api-server",
-		"version":   "1.0.0",
+		"service":   "go-layered-server",
 	})
 }
 
 func (h *HealthHandler) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Welcome to Go API Server",
+		"message": "Welcome to go-layered-server",
 		"health":  "/health",
-		"version": "1.0.0",
 	})
 }
