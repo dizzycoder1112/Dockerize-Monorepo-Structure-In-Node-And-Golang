@@ -25,7 +25,10 @@ Refactored from the original `go-gin-server` template up to the structural compl
 
 ### Operational notes
 
-- Requires Postgres + a `deals(id uuid pk, title text, amount bigint, status text, created_at timestamptz, updated_at timestamptz)` table. Schema is managed via Prisma at the monorepo level — this app does not ship its own migration. `go run` will fatal on Ping if `DATABASE_URL` is unreachable.
+- **Default is in-memory** — `go run` works with zero infra. `DATABASE_URL` unset → `factory.NewMemoryRepo()`.
+- Set `DATABASE_URL` to flip to the pgx-backed Postgres impl (`factory.NewPostgresRepo(pool)`); failure to ping fatals (intentional — silent fallback would hide config bugs).
+- Schema for the postgres path: `deals(id uuid pk, title text, amount bigint, status text, created_at timestamptz, updated_at timestamptz)`. Managed at the monorepo level via Prisma — this app ships no migration.
+- `RepoFactory.UseTransaction` degrades to a direct `fn(repos)` call in memory mode — service-level shape stays identical so swapping backends needs no service changes.
 - Uses the local `go-packages/logger` via `replace` directive — pattern reusable for any monorepo Go app needing the shared logger.
 - `sqlc.yaml` removed (was empty stub with leaked credential — history rewritten via `git filter-repo`, file added to `.gitignore`).
 

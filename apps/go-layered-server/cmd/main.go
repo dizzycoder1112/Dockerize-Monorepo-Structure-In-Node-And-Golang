@@ -19,13 +19,9 @@ func main() {
 		Colored:     config.AppConfig.ENV != "production",
 	})
 
-	pool, err := postgres.NewPool(config.AppConfig.DatabaseURL, appLogger, config.AppConfig.ENV)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-	defer pool.Close()
+	repos, cleanup := buildRepos(appLogger)
+	defer cleanup()
 
-	repos := factory.NewRepo(pool)
 	services := factory.NewService(repos)
 	handlers := factory.NewHandler(services)
 	middlewares := factory.NewMiddleware()
@@ -36,4 +32,22 @@ func main() {
 	if err := r.Run(":" + config.AppConfig.Port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
+}
+
+// buildRepos picks the in-memory backend by default and only reaches for a
+// real Postgres pool when DATABASE_URL is set. Returning a cleanup closure
+// keeps main's defer chain uniform across both branches.
+func buildRepos(appLogger logger.Logger) (*factory.RepoFactory, func()) {
+	if config.AppConfig.DatabaseURL == "" {
+		return factory.NewMemoryRepo(), func() {}
+	}
+
+	pool, err := postgres.NewPool(config.AppConfig.DatabaseURL, appLogger, config.AppConfig.ENV)
+	if err != nil {
+		// Fatal here is intentional: when the operator sets DATABASE_URL they
+		// are asking for the postgres backend; silent fallback to memory would
+		// hide config bugs in production.
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	return factory.NewPostgresRepo(pool), func() { pool.Close() }
 }
