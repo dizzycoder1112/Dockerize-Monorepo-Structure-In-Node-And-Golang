@@ -18,7 +18,6 @@
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "dependencies": {
-    "@ts-packages/db": "workspace:*",
     "@ts-packages/grpc": "workspace:*",
     "@ts-packages/logger": "workspace:*",
     "@ts-packages/shared": "workspace:*",

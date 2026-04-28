@@ -36,9 +36,6 @@ importers:
 
   apps/ts-grpc-demo:
     dependencies:
-      '@ts-packages/db':
-        specifier: workspace:*
-        version: link:../../ts-packages/db
       '@ts-packages/grpc':
         specifier: workspace:*
         version: link:../../ts-packages/grpc
