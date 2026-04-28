@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.1",
-    "@types/node": "^22.13.11",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.19.4"
   }

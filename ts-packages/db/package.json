@@ -17,7 +17,6 @@
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "devDependencies": {
-    "@types/node": "^22.13.11",
     "@types/pg": "^8.11.11",
     "typescript": "^5.8.2"
   },

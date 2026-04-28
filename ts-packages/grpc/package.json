@@ -22,7 +22,6 @@
     "@connectrpc/connect-node": "^2.0.2"
   },
   "devDependencies": {
-    "@types/node": "^22.13.11",
     "typescript": "^5.8.2"
   }
 }
