@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"go-gin-server/internal/db"
+	"go-layered-server/internal/db"
 )
 
 type DealRepository struct {

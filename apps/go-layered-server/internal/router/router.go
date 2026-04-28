@@ -1,8 +1,8 @@
 package router
 
 import (
-	handler "go-gin-server/internal/handler"
-	"go-gin-server/internal/middleware"
+	handler "go-layered-server/internal/handler"
+	"go-layered-server/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )

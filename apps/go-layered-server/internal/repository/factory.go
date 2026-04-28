@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"go-gin-server/internal/db"
-	"go-gin-server/internal/repository/postgres"
+	"go-layered-server/internal/db"
+	"go-layered-server/internal/repository/postgres"
 )
 
 func NewRepoFactory(pgQueries *db.Queries) *Repositories {

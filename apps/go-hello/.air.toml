@@ -1,8 +1,0 @@
-root = "."
-
-[build]
-  cmd = "go build -o ./tmp/main ./cmd/main.go"
-  bin = "tmp/main"
-  include_ext = ["go"]
-  exclude_dir = ["tmp", "node_modules"]
-  delay = 1000

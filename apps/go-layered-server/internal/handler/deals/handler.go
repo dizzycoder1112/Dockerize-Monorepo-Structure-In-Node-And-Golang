@@ -1,7 +1,7 @@
 package deals
 
 import (
-	"go-gin-server/internal/service"
+	"go-layered-server/internal/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

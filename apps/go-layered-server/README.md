@@ -5,7 +5,7 @@ Rails Counter Server 的 Go 重寫版本，使用 Gin 框架。
 ## 📁 專案結構
 
 ```
-go-counter-server/
+go-layered-server/
 ├── cmd/
 │   └── main.go                 # 應用程式入口
 ├── internal/                   # 私有應用程式代碼

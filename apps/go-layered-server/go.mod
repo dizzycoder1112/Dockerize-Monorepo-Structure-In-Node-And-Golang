@@ -1,4 +1,4 @@
-module go-gin-server
+module go-layered-server
 
 go 1.25.1
 

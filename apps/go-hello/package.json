@@ -1,7 +1,0 @@
-{
-  "name": "@apps/go-hello",
-  "version": "1.0.0",
-  "scripts": {
-    "start:dev": "air"
-  }
-}

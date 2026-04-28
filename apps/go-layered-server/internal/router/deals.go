@@ -1,7 +1,7 @@
 package router
 
 import (
-	handler "go-gin-server/internal/handler"
+	handler "go-layered-server/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )

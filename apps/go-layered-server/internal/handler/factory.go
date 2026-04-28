@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"go-gin-server/internal/handler/deals"
-	"go-gin-server/internal/service"
+	"go-layered-server/internal/handler/deals"
+	"go-layered-server/internal/service"
 )
 
 type Handlers struct {

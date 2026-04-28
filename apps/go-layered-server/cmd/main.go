@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 
-	"go-gin-server/internal/config"
-	"go-gin-server/internal/db"
-	"go-gin-server/internal/handler"
-	"go-gin-server/internal/repository"
-	"go-gin-server/internal/router"
-	"go-gin-server/internal/service"
+	"go-layered-server/internal/config"
+	"go-layered-server/internal/db"
+	"go-layered-server/internal/handler"
+	"go-layered-server/internal/repository"
+	"go-layered-server/internal/router"
+	"go-layered-server/internal/service"
 )
 
 func main() {

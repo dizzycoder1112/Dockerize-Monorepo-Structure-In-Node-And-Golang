@@ -1,6 +1,6 @@
 package service
 
-import "go-gin-server/internal/repository"
+import "go-layered-server/internal/repository"
 
 type Services struct {
 	Deal *DealService

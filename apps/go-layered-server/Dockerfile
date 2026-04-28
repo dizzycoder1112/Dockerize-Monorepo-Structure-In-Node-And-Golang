@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy entire monorepo
 COPY . .
 
-WORKDIR /app/apps/go-counter-server
+WORKDIR /app/apps/go-layered-server
 
 # Download dependencies
 RUN go mod download
@@ -21,7 +21,7 @@ RUN apk --no-cache add ca-certificates tzdata openssl
 WORKDIR /app
 
 # Copy only the binary
-COPY --from=builder /app/apps/go-counter-server/main .
+COPY --from=builder /app/apps/go-layered-server/main .
 
 
 CMD ["./main"]

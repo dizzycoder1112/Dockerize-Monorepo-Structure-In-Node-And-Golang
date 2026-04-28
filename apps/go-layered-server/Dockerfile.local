@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-WORKDIR /app/apps/go-counter-server
+WORKDIR /app/apps/go-layered-server
 
 RUN go install github.com/air-verse/air@v1.61.7
 
