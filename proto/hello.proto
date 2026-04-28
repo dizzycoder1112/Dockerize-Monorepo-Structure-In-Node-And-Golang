@@ -3,6 +3,8 @@ syntax = "proto3";
 
 package helloworld;
 
+option go_package = "dizzycoder1112/Dockerize-Monorepo-Structure-In-Node-And-Golang/grpc/pb/hello";
+
 service Greeter {
   rpc SayHello(HelloRequest) returns (HelloReply);
 }
