@@ -50,6 +50,28 @@ Resolution: pin everything to v1, matching the working pooktopia template.
 - Build switched from `tsc` to `tsup` (centralised at root) for dual ESM+CJS output, matching pooktopia
 - ts-grpc-demo `.env` PORT moved to `50051` (gRPC convention) so it doesn't collide with ts-restful-api on `:3000`; `services/index.ts` baseUrl updated to match
 
+### Follow-up: migrate TS side off connect-es to native gRPC (`@grpc/grpc-js` + `ts-proto`)
+
+Current state is "TS server speaks Connect protocol via `connectNodeAdapter`, Go server speaks native gRPC, client picks transport per server". Works, but client has to know which protocol the server speaks — leaky abstraction. Long-term cleaner path is single wire protocol everywhere (native gRPC).
+
+**Why it's worth doing**:
+- connect-es 1.x is deprecated (no v2 plugin; v2 direction is "protoc-gen-es v2 schema only without connect plugin"). We're pinned to a dead-end branch.
+- `@grpc/grpc-js` is Google's official Node gRPC, actively maintained, same ecosystem as `google.golang.org/grpc`.
+- One wire = one set of debugging tools (grpcurl/reflection/wireshark all work everywhere).
+- Smaller dependency surface: drops `@bufbuild/protobuf`, `@connectrpc/connect`, `@connectrpc/connect-node`, `protoc-gen-connect-es`, `protoc-gen-es`.
+
+**Scope** (estimated 1–2 hours):
+1. `package.json`: drop `@bufbuild/protoc-gen-es` + `@connectrpc/protoc-gen-connect-es`, add `ts-proto`
+2. `proto/buf.gen.yaml`: replace `es` + `connect-es` plugins with single `ts_proto`
+3. `ts-packages/grpc/package.json`: drop `@bufbuild/protobuf`, `@connectrpc/connect`, `@connectrpc/connect-node`; add `@grpc/grpc-js`
+4. `pnpm run buf:gen` — generated TS files structure changes completely (ts-proto outputs idiomatic interfaces instead of class-based messages)
+5. Rewrite `ts-packages/grpc/src/{clientFactory,serverFactory,index}.ts` against `@grpc/grpc-js` API
+6. Rewrite `apps/ts-grpc-demo/src/handlers/sayHello.handler.ts` (grpc-js promise/callback style)
+7. Update `apps/ts-restful-api/src/services/index.ts` + `repositories/user.repository.ts` for new client API
+8. Go side unchanged (`protoc-gen-go` + `protoc-gen-go-grpc` already native gRPC)
+
+**Why not now**: too risky pre-interview (2026-04-30). Pick up post-interview.
+
 ## Pre-interview smoke test plan (TODO — do tomorrow)
 
 Goal: validate every workspace package the user might `import` mid-interview, so nothing breaks live. Vibe Coding interview is on **2026-04-30**.
@@ -78,7 +100,10 @@ User will spin up infra (RabbitMQ, Postgres) locally before the run. Order: zero
 ### Skipped (intentional)
 
 - `go-packages/logger` standalone — already exercised by `go-layered-server`, explicit smoke not needed
-- Go-served gRPC round-trip — would need a Go server stub; only `ts-grpc-demo` serves today. Skip unless interview specifically asks
+
+### Stretch — done
+
+- ✅ `apps/go-grpc-demo` on :50052 — minimal Go server using `go-packages/grpc.NewServer()` wrapper, registers `Greeter`, EnableReflection. Verified single TS `createGreeterClient` factory hits **both** ts-grpc-demo (:50051) and go-grpc-demo (:50052) with identical API — `connectNodeAdapter` routes `application/grpc` to native handler so client speaks one protocol everywhere. `clientFactory.ts` now always uses `createGrpcTransport` (no protocol option — was a leaky abstraction)
 
 ### Out-of-scope for tomorrow
 
