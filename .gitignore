@@ -9,3 +9,4 @@
 **/tmp
 /kubernetes/secrets
 sqlc.yaml
+/generated/prisma

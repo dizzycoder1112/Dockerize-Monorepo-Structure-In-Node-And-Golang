@@ -16,14 +16,20 @@
     "build": "turbo run build",
     "start:dev": "docker compose -f docker-compose.local.yml up -d --build && pnpm run watch",
     "watch": "turbo run watch",
-    "buf:gen": "cd proto && buf generate"
+    "buf:gen": "cd proto && buf generate",
+    "main-db:generate": "prisma generate --config prisma/main/prisma.config.ts",
+    "main-db:migrate:create": "prisma migrate dev --create-only --config prisma/main/prisma.config.ts",
+    "main-db:migrate:deploy": "prisma migrate deploy --config prisma/main/prisma.config.ts"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.66.1",
     "@bufbuild/protoc-gen-es": "^1.10.1",
     "@connectrpc/protoc-gen-connect-es": "^1.7.0",
     "@types/node": "^25.6.0",
+    "dotenv": "^17.4.2",
     "prettier": "^3.5.3",
+    "prisma": "^7.8.0",
+    "prisma-kysely": "^3.1.0",
     "tsup": "^8.5.0",
     "turbo": "^2.5.3",
     "typescript": "^5.8.2"

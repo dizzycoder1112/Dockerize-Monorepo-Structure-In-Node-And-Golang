@@ -99,7 +99,7 @@ User will spin up infra (RabbitMQ, Postgres) locally before the run. Order: zero
 | 3 | ✅ | `apps/ts-restful-api` | boots on :3000, `/health-check` → 200 OK; `/api/v1/users/sayHello?name=X` → e2e through grpc to ts-grpc-demo → `{"message":"You said X"}` |
 | 4 | ✅ | `ts-packages/grpc` client ↔ `ts-grpc-demo` | done together with #3 — full client→server roundtrip via Connect-over-H2 on :50051 |
 | 5 | ✅ | `ts-packages/rabbitMQ` ↔ `go-packages/rabbitMQ` | broker on OrbStack `rabbitmq.rabbitmq.orb.local:5672`, both directions verified — TS→Go: `GO_CONSUMED: {"hello":"from ts",...}` / Go→TS: `TS_CONSUMED: {"hello":"from go",...}`. JSON round-trip clean across both `amqplib`(TS) and `amqp091-go`(Go). Smoke runner lives at `tmp/rabbit-smoke/` (gitignored) |
-| 6 | ⏳ | `ts-packages/db` (optional) | needs Postgres; flip `apps/go-layered-server` to `DATABASE_URL=...` to exercise the same connection setup if time permits |
+| 6 | ✅ | `ts-packages/db` (optional) | added `Deal` model to `prisma/main/schema.prisma`, ran `main-db:migrate:deploy` against OrbStack `db.postgres.orb.local:5432`, regenerated Kysely types via `main-db:generate`. Smoke at `tmp/db-smoke/smoke.mjs` walks the full stack: `createDB` → Kysely (CamelCasePlugin auto camelCase↔snake_case) → INSERT + SELECT on `deals` |
 
 ### Skipped (intentional)
 

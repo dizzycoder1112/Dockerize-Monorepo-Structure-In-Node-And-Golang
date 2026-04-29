@@ -1,0 +1,25 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-kysely"
+  output   = "../../ts-packages/db/src/schemas"
+  fileName = "main-schema.ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Deal {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title     String
+  amount    BigInt
+  status    String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt      @map("updated_at") @db.Timestamptz()
+
+  @@map("deals")
+}
