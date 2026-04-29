@@ -12,7 +12,7 @@ jobs:
     outputs:
       version: ${{ steps.appVersion.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Install yq
         run: |

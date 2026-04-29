@@ -31,7 +31,7 @@ jobs:
       deploy-matrix: ${{ steps.generate-matrix.outputs.deploy-matrix }}
       environment-config: ${{ steps.generate-matrix.outputs.environment-config }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Generate deployment matrices
         id: generate-matrix
