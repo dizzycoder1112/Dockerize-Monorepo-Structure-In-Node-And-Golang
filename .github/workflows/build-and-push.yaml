@@ -1,0 +1,81 @@
+on:
+  workflow_call:
+    inputs:
+      serviceName:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      sha:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+      env:
+        required: true
+        type: string
+      skip:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      DO_IMAGE_REGISTRY_TOKEN:
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read registry config
+        id: registry
+        run: |
+          HOST=$(jq -r '.registry.host' .github/services-config.json)
+          NS=$(jq -r '.registry.namespace' .github/services-config.json)
+          echo "host=$HOST" >> $GITHUB_OUTPUT
+          echo "namespace=$NS" >> $GITHUB_OUTPUT
+
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ steps.registry.outputs.host }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.DO_IMAGE_REGISTRY_TOKEN }}
+
+      - name: Build Parameters Setup
+        id: inputs
+        run: |
+          # Versions are expected to follow Semantic Versioning (https://semver.org/)
+          if [[ ! ${{ inputs.version }} =~ ^(latest|[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Invalid version format. Please use the format X.Y.Z"
+            exit 1
+          fi
+
+      - name: Docker Compose Build
+        if: ${{ success() }}
+        run: |
+          docker compose build \
+            --build-arg GIT_COMMIT_SHA=${{ inputs.sha }} \
+            --build-arg APP_VERSION=${{ inputs.version }} \
+            --build-arg ENVIRONMENT=${{ inputs.env }} \
+            ${{ inputs.serviceName }}
+
+      - name: Tag Docker Image
+        if: ${{ success() }}
+        run: |
+          docker tag ${{ inputs.serviceName }} ${{ steps.registry.outputs.host }}/${{ steps.registry.outputs.namespace }}/${{ inputs.image }}:${{ inputs.tag }}
+
+      - name: Push Docker Image
+        if: ${{ success() }}
+        run: |
+          docker push ${{ steps.registry.outputs.host }}/${{ steps.registry.outputs.namespace }}/${{ inputs.image }}:${{ inputs.tag }}

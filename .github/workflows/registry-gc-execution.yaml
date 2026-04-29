@@ -1,0 +1,29 @@
+name: DigitalOcean Garbage Collection Execution
+
+on:
+  workflow_call:
+    secrets:
+      DO_IMAGE_REGISTRY_TOKEN:
+        required: true
+
+jobs:
+  do-garbage-collect-execution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read registry namespace
+        id: registry
+        run: |
+          NS=$(jq -r '.registry.namespace' .github/services-config.json)
+          echo "namespace=$NS" >> $GITHUB_OUTPUT
+
+      - name: setup doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_IMAGE_REGISTRY_TOKEN }}
+          version: 1.141.0
+
+      - name: Run registry garbage collection
+        run: |
+          doctl registry garbage-collection start ${{ steps.registry.outputs.namespace }} --include-untagged-manifests --force
