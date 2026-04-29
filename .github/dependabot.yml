@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # Bumps action versions referenced in .github/workflows/*.yaml
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    # Group related actions into single PRs so the queue doesn't sprawl.
+    groups:
+      docker-actions:
+        patterns:
+          - "docker/*"
+      github-core-actions:
+        patterns:
+          - "actions/*"
