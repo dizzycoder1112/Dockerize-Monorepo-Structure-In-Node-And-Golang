@@ -72,6 +72,10 @@ Current state is "TS server speaks Connect protocol via `connectNodeAdapter`, Go
 
 **Why not now**: too risky pre-interview (2026-04-30). Pick up post-interview.
 
+## go-packages/rabbitMQ — module path renamed
+
+Was `weedza.shop/rabbitmq` (leftover from a different project), renamed to `dizzycoder1112/Dockerize-Monorepo-Structure-In-Node-And-Golang/rabbitmq` to match the rest of the monorepo's module naming convention. No app consumes this package yet, so the only file affected was `go-packages/rabbitMQ/go.mod`.
+
 ## Pre-interview smoke test plan (TODO — do tomorrow)
 
 Goal: validate every workspace package the user might `import` mid-interview, so nothing breaks live. Vibe Coding interview is on **2026-04-30**.
@@ -94,7 +98,7 @@ User will spin up infra (RabbitMQ, Postgres) locally before the run. Order: zero
 | 2 | ✅ | `ts-packages/shared` | `node -e` import `./constants` + `./utils` — verified `SERVICE_NAME` enum (3 values) + `sleep(150)` resolved in 152ms |
 | 3 | ✅ | `apps/ts-restful-api` | boots on :3000, `/health-check` → 200 OK; `/api/v1/users/sayHello?name=X` → e2e through grpc to ts-grpc-demo → `{"message":"You said X"}` |
 | 4 | ✅ | `ts-packages/grpc` client ↔ `ts-grpc-demo` | done together with #3 — full client→server roundtrip via Connect-over-H2 on :50051 |
-| 5 | ⏳ | `ts-packages/rabbitMQ` ↔ `go-packages/rabbitMQ` | bring up broker, run **both directions** (TS→Go and Go→TS). Catches schema/encoding drift across languages |
+| 5 | ✅ | `ts-packages/rabbitMQ` ↔ `go-packages/rabbitMQ` | broker on OrbStack `rabbitmq.rabbitmq.orb.local:5672`, both directions verified — TS→Go: `GO_CONSUMED: {"hello":"from ts",...}` / Go→TS: `TS_CONSUMED: {"hello":"from go",...}`. JSON round-trip clean across both `amqplib`(TS) and `amqp091-go`(Go). Smoke runner lives at `tmp/rabbit-smoke/` (gitignored) |
 | 6 | ⏳ | `ts-packages/db` (optional) | needs Postgres; flip `apps/go-layered-server` to `DATABASE_URL=...` to exercise the same connection setup if time permits |
 
 ### Skipped (intentional)
