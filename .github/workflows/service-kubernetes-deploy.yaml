@@ -48,7 +48,7 @@ jobs:
       - name: Apply Kubernetes Context
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ env.CLUSTER_NAME }}
 
-      - uses: azure/setup-helm@v4.2.0
+      - uses: azure/setup-helm@v5.0.0
         with:
           version: "v3.15.4"
       - name: Deploying Service
