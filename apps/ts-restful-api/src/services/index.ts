@@ -3,7 +3,7 @@ import { RepositoryFactory } from '../repositories';
 import { UserService } from './user.service';
 
 const greeterClient = createGreeterClient({
-  baseUrl: 'http://localhost:8080',
+  baseUrl: 'http://localhost:50051',
 });
 
 const repositoryFactory = new RepositoryFactory({ userClient: greeterClient });

@@ -1,7 +1,7 @@
 import { createConnectTransport } from '@connectrpc/connect-node';
 import { createClient } from '@connectrpc/connect';
-import { Greeter } from './proto/hello_pb';
-import { ElizaService } from './proto/eliza_pb';
+import { Greeter } from './proto/hello_connect';
+import { ElizaService } from './proto/eliza_connect';
 
 // HTTP/2 is hard-coded across this template (server uses node:http2, clients
 // use httpVersion: '2'). Native gRPC requires HTTP/2 by spec, so locking to

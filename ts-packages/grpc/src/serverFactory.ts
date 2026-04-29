@@ -1,8 +1,8 @@
 import { connectNodeAdapter } from '@connectrpc/connect-node';
 import type { ConnectRouter } from '@connectrpc/connect';
-import { Greeter } from './proto/hello_pb';
+import { Greeter } from './proto/hello_connect';
 import type { HelloRequest, HelloReply } from './proto/hello_pb';
-import { ElizaService } from './proto/eliza_pb';
+import { ElizaService } from './proto/eliza_connect';
 import { GrpcServer } from './types';
 
 export interface GrpcServerOptions {

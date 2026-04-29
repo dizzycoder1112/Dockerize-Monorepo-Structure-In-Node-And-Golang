@@ -38,6 +38,18 @@ Refactored from the original `go-gin-server` template up to the structural compl
 - `pkg/utils` Flex* lenient JSON helpers — too business-flavoured
 - Integration test harness — it's a template
 
+## grpc package — pinned to v1 toolchain
+
+connect-es plugin **has no v2** (deprecated after 1.7; the v2 path is "use protoc-gen-es v2 schema only, no separate connect plugin"). Mixing v2 `protoc-gen-es` with v1 `protoc-gen-connect-es` produced incompatible generated files — `_pb` exported `XSchema` but `_connect` imported `X` class → tsc elided the require → `ReferenceError: hello_pb_js_1 is not defined` at runtime.
+
+Resolution: pin everything to v1, matching the working pooktopia template.
+
+- Root `@bufbuild/protoc-gen-es` → `^1.10.1`
+- `ts-packages/grpc` runtime: `@bufbuild/protobuf` `^1.10.1`, `@connectrpc/connect`/`connect-node` `^1.7.0`
+- src refactored to v1 style: service descriptor imported from `_connect` (not `_pb`), `new HelloReply({...})` instead of `create(HelloReplySchema, ...)`, no `export { create }` from index
+- Build switched from `tsc` to `tsup` (centralised at root) for dual ESM+CJS output, matching pooktopia
+- ts-grpc-demo `.env` PORT moved to `50051` (gRPC convention) so it doesn't collide with ts-restful-api on `:3000`; `services/index.ts` baseUrl updated to match
+
 ## Pre-interview smoke test plan (TODO — do tomorrow)
 
 Goal: validate every workspace package the user might `import` mid-interview, so nothing breaks live. Vibe Coding interview is on **2026-04-30**.
@@ -52,18 +64,21 @@ Goal: validate every workspace package the user might `import` mid-interview, so
 
 ### Still to validate
 
-User will spin up infra (RabbitMQ, Postgres) locally before the run.
+User will spin up infra (RabbitMQ, Postgres) locally before the run. Order: zero-infra first, infra-dependent last.
 
-| # | Target | Test |
-|---|---|---|
-| 1 | `apps/ts-restful-api` | start, hit `/health-check` and one `/api/v1/users` route |
-| 2 | `ts-packages/logger` | `node -e` import + emit one line each for info/error/warn/debug |
-| 3 | `ts-packages/shared` | import + call one util / read one constant |
-| 4 | `ts-packages/grpc` client | `createGreeterClient` against the running ts-grpc-demo — proves client+server pair works |
-| 5 | `go-packages/logger` | already exercised by `go-layered-server`; explicit standalone smoke optional |
-| 6 | `ts-packages/rabbitMQ` ↔ `go-packages/rabbitMQ` | bring up broker, run **both directions** of producer/consumer — TS→Go and Go→TS. Catches schema/encoding drift across languages |
-| 7 | `ts-packages/db` (optional) | needs Postgres; flip `apps/go-layered-server` to `DATABASE_URL=...` to exercise the same connection setup if time permits |
-| 8 | gRPC round-trip (stretch) | needs a tiny Go gRPC server stub — currently only `ts-grpc-demo` serves. Skip unless the interview specifically asks for Go-served gRPC |
+| # | Status | Target | Test |
+|---|---|---|---|
+| 1 | ✅ | `ts-packages/logger` | `node -e` import + emit one line each for info/warn/error/debug — verified pretty transport, ISO timestamp, serviceName, context all working |
+| 2 | ✅ | `ts-packages/shared` | `node -e` import `./constants` + `./utils` — verified `SERVICE_NAME` enum (3 values) + `sleep(150)` resolved in 152ms |
+| 3 | ✅ | `apps/ts-restful-api` | boots on :3000, `/health-check` → 200 OK; `/api/v1/users/sayHello?name=X` → e2e through grpc to ts-grpc-demo → `{"message":"You said X"}` |
+| 4 | ✅ | `ts-packages/grpc` client ↔ `ts-grpc-demo` | done together with #3 — full client→server roundtrip via Connect-over-H2 on :50051 |
+| 5 | ⏳ | `ts-packages/rabbitMQ` ↔ `go-packages/rabbitMQ` | bring up broker, run **both directions** (TS→Go and Go→TS). Catches schema/encoding drift across languages |
+| 6 | ⏳ | `ts-packages/db` (optional) | needs Postgres; flip `apps/go-layered-server` to `DATABASE_URL=...` to exercise the same connection setup if time permits |
+
+### Skipped (intentional)
+
+- `go-packages/logger` standalone — already exercised by `go-layered-server`, explicit smoke not needed
+- Go-served gRPC round-trip — would need a Go server stub; only `ts-grpc-demo` serves today. Skip unless interview specifically asks
 
 ### Out-of-scope for tomorrow
 

@@ -3,23 +3,29 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./dist && tsc -p tsconfig.prod.json",
-    "watch": "tsc -p tsconfig.prod.json --watch"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "watch": "tsup --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "dependencies": {
-    "@bufbuild/protobuf": "^2.3.0",
-    "@connectrpc/connect": "^2.0.2",
-    "@connectrpc/connect-node": "^2.0.2"
+    "@bufbuild/protobuf": "^1.10.1",
+    "@connectrpc/connect": "^1.7.0",
+    "@connectrpc/connect-node": "^1.7.0"
   },
   "devDependencies": {
     "typescript": "^5.8.2"
