@@ -37,7 +37,37 @@ Refactored from the original `go-gin-server` template up to the structural compl
 - Auth JWT middleware — consumers add their own
 - `pkg/utils` Flex* lenient JSON helpers — too business-flavoured
 - Integration test harness — it's a template
-- README rewrite — original "Go Counter Server" content still present, deferred
+
+## Pre-interview smoke test plan (TODO — do tomorrow)
+
+Goal: validate every workspace package the user might `import` mid-interview, so nothing breaks live. Vibe Coding interview is on **2026-04-30**.
+
+### Already validated
+
+- `apps/go-ddd-server` — boots, all 7 routes, in-memory mode ✅
+- `apps/go-layered-server` — boots, all 7 routes incl. TxRunner-routed `Close`, in-memory mode ✅
+- `apps/ts-grpc-demo` — boots, Connect protocol curl roundtrip ✅
+- `pnpm run build` — 8/8 turbo green after `@types/node` centralised at root ✅
+- `pnpm run buf:gen` — Go + TS codegen both work, generated Go pb compiles ✅
+
+### Still to validate
+
+User will spin up infra (RabbitMQ, Postgres) locally before the run.
+
+| # | Target | Test |
+|---|---|---|
+| 1 | `apps/ts-restful-api` | start, hit `/health-check` and one `/api/v1/users` route |
+| 2 | `ts-packages/logger` | `node -e` import + emit one line each for info/error/warn/debug |
+| 3 | `ts-packages/shared` | import + call one util / read one constant |
+| 4 | `ts-packages/grpc` client | `createGreeterClient` against the running ts-grpc-demo — proves client+server pair works |
+| 5 | `go-packages/logger` | already exercised by `go-layered-server`; explicit standalone smoke optional |
+| 6 | `ts-packages/rabbitMQ` ↔ `go-packages/rabbitMQ` | bring up broker, run **both directions** of producer/consumer — TS→Go and Go→TS. Catches schema/encoding drift across languages |
+| 7 | `ts-packages/db` (optional) | needs Postgres; flip `apps/go-layered-server` to `DATABASE_URL=...` to exercise the same connection setup if time permits |
+| 8 | gRPC round-trip (stretch) | needs a tiny Go gRPC server stub — currently only `ts-grpc-demo` serves. Skip unless the interview specifically asks for Go-served gRPC |
+
+### Out-of-scope for tomorrow
+
+- README rewrite for `go-layered-server` (currently has the old "Go Counter Server" content) — deferred
 
 ## Architecture conventions (target state, both Go apps)
 

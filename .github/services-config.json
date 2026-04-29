@@ -1,4 +1,8 @@
 {
+  "registry": {
+    "host": "registry.digitalocean.com",
+    "namespace": "your-registry"
+  },
   "services": [
     {
       "name": "app",
