@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@ts-packages/shared": "workspace:*",
-    "kysely": "^0.27.6",
+    "kysely": "^0.28.14",
     "pg": "^8.14.1"
   }
 }
