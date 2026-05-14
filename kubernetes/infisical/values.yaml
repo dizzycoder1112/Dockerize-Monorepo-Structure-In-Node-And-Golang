@@ -15,13 +15,13 @@ postgresql:
   enabled: false
 
 backendEnvironmentVariables:
-  # PostgreSQL 連接
+  # PostgreSQL connection
   DB_CONNECTION_URI: postgresql://<db-user>:<db-password>@<db-host>:<db-port>/<db-name> #hint: weedza-dev data-center
 
-  # Redis 連接
+  # Redis connection
   REDIS_URL: 'redis://<redis-host>:<redis-port>/<db>'
 
-  # SMTP 配置（必要）
+  # SMTP config (required)
   SMTP_HOST: 'sandbox.smtp.mailtrap.io'
   SMTP_PORT: 2525
   SMTP_SECURE: 'false'
@@ -30,7 +30,7 @@ backendEnvironmentVariables:
   SMTP_USERNAME: 'username'
   SMTP_PASSWORD: 'password'
 
-  # 站點 URL
+  # Site URL
   SITE_URL: 'http://localhost:8080'
 
 ingress:

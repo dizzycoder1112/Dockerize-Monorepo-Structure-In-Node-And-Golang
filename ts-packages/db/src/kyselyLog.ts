@@ -20,10 +20,10 @@ function convertBufferToBase64(value: unknown): string | unknown {
 }
 
 function looksSensitive(value: string): boolean {
-  return value.includes("password"); // 密碼
+  return value.includes("password"); // password
   // value.includes('@') || // email
-  // value.length > 50 ||   // 長字串（可能是 token）
-  // value.match(/^(\d{4}[- ]?){4}\d{4}$/) // 簡單信用卡格式
+  // value.length > 50 ||   // long string (possibly a token)
+  // value.match(/^(\d{4}[- ]?){4}\d{4}$/) // simple credit-card pattern
 }
 
 export function createKyselyLogger(logger: Logger) {
