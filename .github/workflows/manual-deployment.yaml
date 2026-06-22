@@ -32,7 +32,7 @@ jobs:
     outputs:
       services-skip-json: ${{ steps.flags.outputs.services-skip-json }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Generate skip flags JSON
         id: flags

@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !inputs.skip }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Read registry config
         id: registry

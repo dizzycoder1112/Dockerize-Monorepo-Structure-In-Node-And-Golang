@@ -31,7 +31,7 @@ jobs:
     outputs:
       services-skip-json: ${{ steps.check-services.outputs.services-skip-json }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Get full history for comparison
 
