@@ -34,7 +34,7 @@ jobs:
     env:
       CLUSTER_NAME: k8s-polycoin-do-sgp
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Inputs Validation
         run: |
           # Versions are expected to follow Semantic Versioning (https://semver.org/)
